@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "plot.h"
 #include <qmath.h>
+#include "LargeVis/Linux/LargeVis.h"
 
 static double randomValue()
 {
@@ -8,27 +9,30 @@ static double randomValue()
     return ( qrand() % 100000 ) / 100000.0;
 }
 
-MainWindow::MainWindow()
+MainWindow::MainWindow(float *points, long long vertices, long long dims)
 {
+    vispoints = points;
+    n_vertices = vertices;
+    out_dims = dims;
     d_plot = new Plot( this );
     d_plot->setTitle( "Scatter Plot" );
     setCentralWidget( d_plot );
 
     // a million points
-    setSamples( 100000 );
+    setSamples();
 }
 
-void MainWindow::setSamples( int numPoints )
+void MainWindow::setSamples( )
 {
     QPolygonF samples;
 
-    for ( int i = 0; i < numPoints; i++ )
-    {
-        const double x = randomValue() * 24.0 + 1.0;
-        const double y = ::log( 10.0 * ( x - 1.0 ) + 1.0 ) 
-            * ( randomValue() * 0.5 + 0.9 );
+    if(out_dims == 2) {
+        for ( long long i = 0; i < n_vertices; i++ )
+        {
 
-        samples += QPointF( x, y );
+            samples += QPointF( vispoints[i*out_dims], vispoints[i*out_dims+1] );
+        }
+
     }
 
     d_plot->setSamples( samples );

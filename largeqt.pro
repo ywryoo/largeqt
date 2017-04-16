@@ -64,9 +64,16 @@ TARGET       = scatterplot
 
 HEADERS = \
     mainwindow.h \
-    plot.h
+    plot.h \
+    LargeVis/Linux/LargeVis.h
+
+LIBS += -lm
+LIBS += -pthread
+LIBS += -lgsl
+LIBS += -lgslcblas
 
 SOURCES = \
     main.cpp \
     mainwindow.cpp \
-    plot.cpp
+    plot.cpp \
+    LargeVis/Linux/LargeVis.cpp

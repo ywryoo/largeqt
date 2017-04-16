@@ -10,10 +10,13 @@ class MainWindow: public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow();
+    MainWindow(float *points, long long vertices, long long dims);
 
 private:
-    void setSamples( int samples );
+    float *vispoints;
+    long long n_vertices;
+    long long out_dims;
+    void setSamples();
 
 private:
     Plot *d_plot;
