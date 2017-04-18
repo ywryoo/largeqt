@@ -1,0 +1,3 @@
+[submodule "LargeVis"]
+	path = LargeVis
+	url = https://github.com/ywryoo/LargeVis.git
