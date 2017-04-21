@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "plot.h"
 #include <qmath.h>
-#include "LargeVis/Linux/LargeVis.h"
+#include "LargeVis/Mac/LargeVis.h"
 
 static double randomValue()
 {

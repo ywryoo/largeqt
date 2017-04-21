@@ -1,6 +1,6 @@
 #include <qapplication.h>
 #include "mainwindow.h"
-#include "LargeVis/Linux/LargeVis.h"
+#include "LargeVis/Mac/LargeVis.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

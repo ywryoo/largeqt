@@ -1,6 +1,8 @@
 QWT_ROOT = /usr/local/qwt-6.1.3
+macx {
+QWT_ROOT = /usr/local/Cellar/qwt/6.1.3_4/features
+}
 include( $${QWT_ROOT}/qwtconfig.pri )
-include( $${QWT_ROOT}/qwtbuild.pri )
 include( $${QWT_ROOT}/qwtfunctions.pri )
 
 QWT_OUT_ROOT = $${PWD}
@@ -58,14 +60,20 @@ win32 {
         DEFINES    += QT_DLL QWT_DLL
     }
 }
+
+macx {
+   LIBS += -L/usr/local/lib
+   INCLUDEPATH += /usr/local/include
+}
 CONFIG += qwt
+CONFIG += c++11
 
 TARGET       = scatterplot
 
 HEADERS = \
     mainwindow.h \
     plot.h \
-    LargeVis/Linux/LargeVis.h
+    LargeVis/Mac/LargeVis.h
 
 LIBS += -lm
 LIBS += -pthread
@@ -76,4 +84,4 @@ SOURCES = \
     main.cpp \
     mainwindow.cpp \
     plot.cpp \
-    LargeVis/Linux/LargeVis.cpp
+    LargeVis/Mac/LargeVis.cpp
