@@ -1,0 +1,3 @@
+[submodule "pixelsne"]
+	path = pixelsne
+	url = https://github.com/ywryoo/pixelsne.git
