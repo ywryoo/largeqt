@@ -1,7 +1,11 @@
-#ifndef _MAINWINDOW_H_
-#define _MAINWINDOW_H_ 1
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-#include <qmainwindow.h>
+#include <QMainWindow>
+
+namespace Ui {
+class MainWindow;
+}
 
 class Plot;
 
@@ -11,7 +15,7 @@ class MainWindow: public QMainWindow
 
 public:
     MainWindow(float *points, long long vertices, long long dims);
-
+    ~MainWindow();
 private:
     float *vispoints;
     long long n_vertices;
@@ -20,6 +24,7 @@ private:
 
 private:
     Plot *d_plot;
+    Ui::MainWindow *ui;
 };
 
 #endif

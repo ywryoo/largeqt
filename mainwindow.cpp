@@ -2,6 +2,7 @@
 #include "plot.h"
 #include <qmath.h>
 #include "pixelsne/LargeVis.h"
+#include "ui_mainwindow.h"
 
 static double randomValue()
 {
@@ -11,15 +12,24 @@ static double randomValue()
 
 MainWindow::MainWindow(float *points, long long vertices, long long dims)
 {
+    ui = new Ui::MainWindow;
+    ui->setupUi(this);
+
     vispoints = points;
     n_vertices = vertices;
     out_dims = dims;
-    d_plot = new Plot( this );
+    d_plot = new Plot( ui->scatterplot );
     d_plot->setTitle( "Scatter Plot" );
-    setCentralWidget( d_plot );
+
+    //setCentralWidget( d_plot );
 
     // a million points
     setSamples();
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
 }
 
 void MainWindow::setSamples( )

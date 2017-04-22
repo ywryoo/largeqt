@@ -77,15 +77,16 @@ int main( int argc, char **argv )
 */    
     QApplication a( argc, argv );
 
-//    MainWindow w(model.get_ans(), model.get_n_vertices(), model.get_out_dim());
-//    MainWindow w(0,0,0);
+   // MainWindow w(model.get_ans(), model.get_n_vertices(), model.get_out_dim());
 
-  //  w.resize( 800, 600 );
-  //  w.show();
-    QPushButton button;
-button.setText("My text");
-button.setToolTip("A tooltip");
-button.show();
+    MainWindow w(0,0,0);
+
+    w.resize( 800, 600 );
+    w.show();
+//    QPushButton button;
+//button.setText("My text");
+//button.setToolTip("A tooltip");
+//button.show();
 
     return a.exec();
 }

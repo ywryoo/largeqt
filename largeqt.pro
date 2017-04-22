@@ -92,3 +92,6 @@ SOURCES = \
     pixelsne/LargeVis.cpp \
     pixelsne/pixelsne.cpp \
     pixelsne/ptree.cpp
+
+FORMS += \
+    mainwindow.ui
