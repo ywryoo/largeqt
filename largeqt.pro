@@ -73,7 +73,12 @@ TARGET       = scatterplot
 HEADERS = \
     mainwindow.h \
     plot.h \
-    LargeVis/Mac/LargeVis.h
+    pixelsne/LargeVis.h \
+    pixelsne/pixelsne.h \
+    pixelsne/ptree.h \
+    pixelsne/vptree.h
+
+
 
 LIBS += -lm
 LIBS += -pthread
@@ -84,4 +89,6 @@ SOURCES = \
     main.cpp \
     mainwindow.cpp \
     plot.cpp \
-    LargeVis/Mac/LargeVis.cpp
+    pixelsne/LargeVis.cpp \
+    pixelsne/pixelsne.cpp \
+    pixelsne/ptree.cpp
