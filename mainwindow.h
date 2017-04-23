@@ -22,6 +22,8 @@ private:
     long long n_vertices;
     long long out_dims;
     void setSamples();
+    void setSamples(double*, int, int);
+    double fexp(double);
     Plot *d_plot;
 };
 

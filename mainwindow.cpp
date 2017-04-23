@@ -1,13 +1,13 @@
 #include "mainwindow.h"
 #include "plot.h"
-#include <qmath.h>
 #include "pixelsne/LargeVis.h"
+#include "pixelsne/pixelsne.h"
 //#include "ui_mainwindow.h"
 #include "borderlayout.h"
 #include <QTextBrowser>
 #include <QLabel>
 #include <QtWidgets>
-#include <QPushButton>>
+#include <QPushButton>
 
 MainWindow::MainWindow(float *points, long long vertices, long long dims)
 {
@@ -47,8 +47,45 @@ MainWindow::MainWindow(float *points, long long vertices, long long dims)
 
     //setCentralWidget( d_plot );
 
-    // a million points
-    setSamples();
+    // Define some variables
+    int     origN;
+    int     N;
+    int     D;
+    int     no_dims;
+    double  perplexity;
+    double  theta;
+    double* data;
+    unsigned int bins;
+    int     p_method;
+    int rand_seed = 30;
+    PixelSNE* pixelsne = new PixelSNE();
+
+    // #ifdef USE_BITWISE_OP
+    //     printf("pixelsne.cpp USE_BITWISE_OP\n");
+    // #else
+    //     printf("pixelsne.cpp not USE_BITWISE_OP\n");
+    // #endif
+
+    // Read the parameters and the dataset
+    if(pixelsne->load_data(&data, &origN, &D, &no_dims, &theta, &perplexity, &bins, &p_method, &rand_seed)) {
+        // Make dummy landmarks
+        N = origN;
+
+        int* landmarks = (int*) malloc(N * sizeof(int));
+        if(landmarks == NULL) { printf("Memory allocation failed!\n"); exit(1); }
+        for(int n = 0; n < N; n++) landmarks[n] = n;
+
+        double* Y = (double*) malloc(N * no_dims * sizeof(double));
+        double* costs = (double*) calloc(N, sizeof(double));
+        if(Y == NULL || costs == NULL) { printf("Memory allocation failed!\n"); exit(1); }
+
+        pixelsne->run(data, N, D, Y, no_dims, perplexity, theta, bins, p_method, rand_seed, false);
+        setSamples(Y, N, no_dims);
+
+    }
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -71,6 +108,21 @@ void MainWindow::setSamples( )
         {
 
             samples += QPointF( vispoints[i*out_dims], vispoints[i*out_dims+1] );
+        }
+
+    }
+
+    d_plot->setSamples( samples );
+}
+void MainWindow::setSamples(double* Y, int N, int no_dims)
+{
+    QPolygonF samples;
+
+    if(no_dims == 2) {
+        for ( long long i = 0; i < N; i++ )
+        {
+
+            samples += QPointF(Y[i*no_dims],Y[i*no_dims+1] );
         }
 
     }
