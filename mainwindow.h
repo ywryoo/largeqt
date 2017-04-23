@@ -1,15 +1,15 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QMainWindow>
+#include <QWidget>
+#include <QDialog>
 
-namespace Ui {
-class MainWindow;
-}
+class QLabel;
+class QGroupBox;
 
 class Plot;
 
-class MainWindow: public QMainWindow
+class MainWindow: public QWidget
 {
     Q_OBJECT
 
@@ -17,14 +17,12 @@ public:
     MainWindow(float *points, long long vertices, long long dims);
     ~MainWindow();
 private:
+    QLabel *createLabel(const QString &text);
     float *vispoints;
     long long n_vertices;
     long long out_dims;
     void setSamples();
-
-private:
     Plot *d_plot;
-    Ui::MainWindow *ui;
 };
 
 #endif

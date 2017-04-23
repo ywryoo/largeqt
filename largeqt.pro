@@ -1,34 +1,36 @@
 QWT_ROOT = /usr/local/qwt-6.1.3
 macx {
-QWT_ROOT = /usr/local/Cellar/qwt/6.1.3_4/features
+    QWT_ROOT = /usr/local/Cellar/qwt/6.1.3_4/features
 }
 include( $${QWT_ROOT}/qwtconfig.pri )
 include( $${QWT_ROOT}/qwtfunctions.pri )
 
-QWT_OUT_ROOT = $${PWD}
+OUT_ROOT = $${PWD}
 
 TEMPLATE     = app
 
 INCLUDEPATH += $${QWT_ROOT}/src
 DEPENDPATH  += $${QWT_ROOT}/src
 
+QT += widgets
+
 !debug_and_release {
 
-    DESTDIR      = $${QWT_OUT_ROOT}/bin
+    DESTDIR      = $${OUT_ROOT}/bin
 }
 else {
     CONFIG(debug, debug|release) {
 
-        DESTDIR      = $${QWT_OUT_ROOT}/bin_debug
+        DESTDIR      = $${OUT_ROOT}/bin_debug
     }
     else {
 
-        DESTDIR      = $${QWT_OUT_ROOT}/bin
+        DESTDIR      = $${OUT_ROOT}/bin
     }
 }
 
-QMAKE_RPATHDIR *= $${QWT_OUT_ROOT}/lib
-qwtAddLibrary($${QWT_OUT_ROOT}/lib, qwt)
+QMAKE_RPATHDIR *= $${OUT_ROOT}/lib
+qwtAddLibrary($${OUT_ROOT}/lib, qwt)
 
 greaterThan(QT_MAJOR_VERSION, 4) {
 
@@ -46,7 +48,6 @@ else {
 }
 
 contains(QWT_CONFIG, QwtSvg) {
-
     QT += svg
 }
 else {
@@ -76,7 +77,10 @@ HEADERS = \
     pixelsne/LargeVis.h \
     pixelsne/pixelsne.h \
     pixelsne/ptree.h \
-    pixelsne/vptree.h
+    pixelsne/ANNOY/annoylib.h \
+    pixelsne/ANNOY/kissrandom.h \
+    pixelsne/vptree.h \
+    borderlayout.h
 
 
 
@@ -91,7 +95,6 @@ SOURCES = \
     plot.cpp \
     pixelsne/LargeVis.cpp \
     pixelsne/pixelsne.cpp \
-    pixelsne/ptree.cpp
+    pixelsne/ptree.cpp \
+    borderlayout.cpp
 
-FORMS += \
-    mainwindow.ui

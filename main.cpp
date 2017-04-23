@@ -1,10 +1,10 @@
-#include <qapplication.h>
-#include <QPushButton>
+#include <QApplication>
 #include "mainwindow.h"
 #include "pixelsne/pixelsne.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "dialog.h"
 
 int main( int argc, char **argv )
 {
@@ -81,8 +81,9 @@ int main( int argc, char **argv )
 
     MainWindow w(0,0,0);
 
-    w.resize( 800, 600 );
     w.show();
+  //  Dialog dialog;
+  //  dialog.show();
 //    QPushButton button;
 //button.setText("My text");
 //button.setToolTip("A tooltip");
