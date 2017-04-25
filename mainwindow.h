@@ -3,6 +3,9 @@
 
 #include <QWidget>
 #include <QDialog>
+#include <QThread>
+#include "pixelsne/LargeVis.h"
+#include "pixelsne/pixelsne.h"
 
 class QLabel;
 class QGroupBox;
@@ -16,15 +19,19 @@ class MainWindow: public QWidget
 public:
     MainWindow(float *points, long long vertices, long long dims);
     ~MainWindow();
+
+private slots:
+    void setSamples(double*, int, int);
+
+
 private:
+    void *pixelsne_caller(void*);
+    void run_pixelsne(int);
     QLabel *createLabel(const QString &text);
     float *vispoints;
     long long n_vertices;
     long long out_dims;
-    void setSamples();
-    void setSamples(double*, int, int);
     double fexp(double);
     Plot *d_plot;
 };
-
 #endif

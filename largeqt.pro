@@ -12,7 +12,7 @@ TEMPLATE     = app
 INCLUDEPATH += $${QWT_ROOT}/src
 DEPENDPATH  += $${QWT_ROOT}/src
 
-QT += widgets
+QT += widgets core
 
 !debug_and_release {
 
@@ -80,7 +80,8 @@ HEADERS = \
     pixelsne/ANNOY/annoylib.h \
     pixelsne/ANNOY/kissrandom.h \
     pixelsne/vptree.h \
-    borderlayout.h
+    borderlayout.h \
+    workerthread.h
 
 
 
@@ -96,5 +97,6 @@ SOURCES = \
     pixelsne/LargeVis.cpp \
     pixelsne/pixelsne.cpp \
     pixelsne/ptree.cpp \
-    borderlayout.cpp
+    borderlayout.cpp \
+    workerthread.cpp
 
