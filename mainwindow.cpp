@@ -12,8 +12,6 @@ MainWindow::MainWindow()
 
     d_plot = new Plot( this );
 
-    d_plot->setTitle( "Scatter Plot" );
-
     QTextBrowser *centralWidget = new QTextBrowser;
     centralWidget->setPlainText(tr("Central widget"));
     QPushButton *button = new QPushButton("&Run", this);
@@ -30,7 +28,7 @@ MainWindow::MainWindow()
     layout->addRow(button);
     formGroupBox->setLayout(layout);
 
-    consoleLabel = createLabel(" ");
+    consoleLabel = createLabel("click Run to start visualization.");
 
     BorderLayout *mainLayout = new BorderLayout;
     mainLayout->addWidget(d_plot, BorderLayout::Center);
@@ -41,7 +39,7 @@ MainWindow::MainWindow()
     mainLayout->addWidget(consoleLabel, BorderLayout::South);
     setLayout(mainLayout);
 
-    setWindowTitle(tr("Border Layout"));
+    setWindowTitle(tr("Largeqt"));
 
     //setCentralWidget( d_plot );
 
