@@ -1,21 +1,14 @@
 #include "mainwindow.h"
 #include "plot.h"
-#include "pixelsne/LargeVis.h"
-#include "pixelsne/pixelsne.h"
-//#include "ui_mainwindow.h"
 #include "borderlayout.h"
 #include <QTextBrowser>
 #include <QLabel>
 #include <QtWidgets>
 #include <QPushButton>
-#include <QThread>
 #include "workerthread.h"
 
-MainWindow::MainWindow(float *points, long long vertices, long long dims)
+MainWindow::MainWindow()
 {
-    vispoints = points;
-    n_vertices = vertices;
-    out_dims = dims;
 
     d_plot = new Plot( this );
 
@@ -24,6 +17,7 @@ MainWindow::MainWindow(float *points, long long vertices, long long dims)
     QTextBrowser *centralWidget = new QTextBrowser;
     centralWidget->setPlainText(tr("Central widget"));
     QPushButton *button = new QPushButton("&Run", this);
+    QObject::connect(button, SIGNAL(clicked()),this, SLOT(startPixelSNE()));
     QWidget *formGroupBox = new QWidget;
     QFormLayout *layout = new QFormLayout;
     layout->addRow(new QLabel(tr("Input Location")), new QLineEdit);
@@ -36,27 +30,27 @@ MainWindow::MainWindow(float *points, long long vertices, long long dims)
     layout->addRow(button);
     formGroupBox->setLayout(layout);
 
+    consoleLabel = createLabel(" ");
+
     BorderLayout *mainLayout = new BorderLayout;
     mainLayout->addWidget(d_plot, BorderLayout::Center);
     //mainLayout->addWidget(createLabel("North"), BorderLayout::North);
     //mainLayout->addWidget(createLabel("West"), BorderLayout::West);
     mainLayout->addWidget(formGroupBox, BorderLayout::East);
     //mainLayout->addWidget(createLabel("East 2") , BorderLayout::East);
-    //mainLayout->addWidget(createLabel("South"), BorderLayout::South);
+    mainLayout->addWidget(consoleLabel, BorderLayout::South);
     setLayout(mainLayout);
 
     setWindowTitle(tr("Border Layout"));
 
     //setCentralWidget( d_plot );
 
-   WorkerThread *thread = new WorkerThread;
-    connect(thread, SIGNAL(resultReady(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
-    thread->runrun();
-
 }
 
 MainWindow::~MainWindow()
 {
+    if(d_plot != NULL) free(d_plot); d_plot=NULL;
+    if(thread != NULL && thread->isRunning()) thread->exit();
 }
 
 QLabel *MainWindow::createLabel(const QString &text)
@@ -64,6 +58,11 @@ QLabel *MainWindow::createLabel(const QString &text)
     QLabel *label = new QLabel(text);
     label->setFrameStyle(QFrame::Box | QFrame::Raised);
     return label;
+}
+
+void MainWindow::setConsoleText(const QString text)
+{
+    consoleLabel->setText(text);
 }
 
 void MainWindow::setSamples(double* Y, int N, int no_dims)
@@ -80,4 +79,19 @@ void MainWindow::setSamples(double* Y, int N, int no_dims)
 
     d_plot->setSamples( samples );
     d_plot->replot();
+}
+
+void MainWindow::startPixelSNE()
+{
+    if(thread != NULL && thread->isRunning()) {
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Wait!");
+        msgBox.setText("PixelSNE is Already running!");
+        msgBox.exec();
+    } else {
+        thread = new WorkerThread;
+        connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
+        connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
+        thread->runrun();
+    }
 }

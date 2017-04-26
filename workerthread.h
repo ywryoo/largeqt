@@ -18,7 +18,8 @@ protected:
     void run() override;
 
 signals:
-    void resultReady(double* Y, int N, int no_dims);
+    void updatePoints(double* Y, int N, int no_dims);
+    void sendLog(QString text);
 private:
     int     origN;
     int     N;

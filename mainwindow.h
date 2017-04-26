@@ -2,10 +2,8 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
-#include <QDialog>
 #include <QThread>
-#include "pixelsne/LargeVis.h"
-#include "pixelsne/pixelsne.h"
+#include "workerthread.h"
 
 class QLabel;
 class QGroupBox;
@@ -17,21 +15,17 @@ class MainWindow: public QWidget
     Q_OBJECT
 
 public:
-    MainWindow(float *points, long long vertices, long long dims);
+    MainWindow();
     ~MainWindow();
 
 private slots:
     void setSamples(double*, int, int);
-
-
+    void startPixelSNE();
+    void setConsoleText(const QString text);
 private:
-    void *pixelsne_caller(void*);
-    void run_pixelsne(int);
     QLabel *createLabel(const QString &text);
-    float *vispoints;
-    long long n_vertices;
-    long long out_dims;
-    double fexp(double);
+    QLabel *consoleLabel;
+    WorkerThread *thread;
     Plot *d_plot;
 };
 #endif

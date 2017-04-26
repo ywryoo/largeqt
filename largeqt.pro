@@ -81,7 +81,8 @@ HEADERS = \
     pixelsne/ANNOY/kissrandom.h \
     pixelsne/vptree.h \
     borderlayout.h \
-    workerthread.h
+    workerthread.h \
+    neighborthread.h
 
 
 
@@ -98,5 +99,6 @@ SOURCES = \
     pixelsne/pixelsne.cpp \
     pixelsne/ptree.cpp \
     borderlayout.cpp \
-    workerthread.cpp
+    workerthread.cpp \
+    neighborthread.cpp
 

@@ -78,7 +78,7 @@ int main( int argc, char **argv )
 
    // MainWindow w(model.get_ans(), model.get_n_vertices(), model.get_out_dim());
 
-    MainWindow w(0,0,0);
+    MainWindow w;
 
     w.show();
   //  Dialog dialog;
