@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QWidget>
+#include <QtWidgets>
 #include <QThread>
 #include "workerthread.h"
 
@@ -25,6 +26,13 @@ private slots:
 private:
     QLabel *createLabel(const QString &text);
     QLabel *consoleLabel;
+    QLineEdit* QinputLocation;
+    QLineEdit* QoutputLocation;
+    QDoubleSpinBox* Qtheta;
+    QSpinBox* Qperplexity;
+    QSpinBox* Qno_dims;
+    QSpinBox* Qp_method;
+    QSpinBox* Qbin;
     WorkerThread *thread;
     Plot *d_plot;
 };

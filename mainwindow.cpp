@@ -18,13 +18,28 @@ MainWindow::MainWindow()
     QObject::connect(button, SIGNAL(clicked()),this, SLOT(startPixelSNE()));
     QWidget *formGroupBox = new QWidget;
     QFormLayout *layout = new QFormLayout;
-    layout->addRow(new QLabel(tr("Input Location")), new QLineEdit);
-    layout->addRow(new QLabel(tr("Output Location")), new QLineEdit);
-    layout->addRow(new QLabel(tr("theta")), new QSpinBox);
-    layout->addRow(new QLabel(tr("perplexity")), new QSpinBox);
-    layout->addRow(new QLabel(tr("no_dims")), new QSpinBox);
-    layout->addRow(new QLabel(tr("p_method")), new QSpinBox);
-    layout->addRow(new QLabel(tr("bin")), new QSpinBox);
+    QLineEdit* QinputLocation = new QLineEdit("");
+    QinputLocation->setText("data.dat");
+    QLineEdit* QoutputLocation = new QLineEdit("");
+    QoutputLocation->setText("out");
+    Qtheta = new QDoubleSpinBox();
+    Qtheta->setValue(0.5);
+    Qperplexity = new QSpinBox();
+    Qperplexity->setValue(50);
+    Qno_dims = new QSpinBox();
+    Qno_dims->setValue(2);
+    Qp_method = new QSpinBox();
+    Qp_method->setValue(0);
+    Qbin = new QSpinBox();
+    Qbin->setMaximum(4096);
+    Qbin->setValue(512);
+    layout->addRow(new QLabel(tr("Input Location")), QinputLocation);
+    layout->addRow(new QLabel(tr("Output Location")), QoutputLocation);
+    layout->addRow(new QLabel(tr("theta")), Qtheta);
+    layout->addRow(new QLabel(tr("perplexity")), Qperplexity);
+    layout->addRow(new QLabel(tr("no_dims")), Qno_dims);
+    layout->addRow(new QLabel(tr("p_method")), Qp_method);
+    layout->addRow(new QLabel(tr("bin")), Qbin);
     layout->addRow(button);
     formGroupBox->setLayout(layout);
 
@@ -81,6 +96,8 @@ void MainWindow::setSamples(double* Y, int N, int no_dims)
 
 void MainWindow::startPixelSNE()
 {
+
+//    printf("%s\n", QinputLocation->text().toUtf8().constData());
     if(thread != NULL && thread->isRunning()) {
         QMessageBox msgBox;
         msgBox.setWindowTitle("Wait!");
@@ -90,6 +107,6 @@ void MainWindow::startPixelSNE()
         thread = new WorkerThread;
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun();
+        thread->runrun(/*QinputLocation->text().toUtf8().constData()*/);
     }
 }
