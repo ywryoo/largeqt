@@ -54,10 +54,12 @@ void WorkerThread::run()
     // #endif
 
     // Read the parameters and the dataset
-    int temp, temp2;
-    pixelsne->load_data(inputLoc.toUtf8().constData(), &data, &temp, &temp2);
-    origN = temp;
-    D = temp2;
+    int tempint;
+    double tempdouble;
+    unsigned int tempuint;
+
+    pixelsne->load_data(inputLoc.toUtf8().constData(), &data, &origN, &D, &tempint, &tempdouble, &tempdouble, &tempuint, &tempint, &tempint);
+
         /*&no_dims, &theta, &perplexity, &bins, &p_method, &rand_seed*/
     sendLog(QString("Data(%1, %2 dimension) Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));
     // Make dummy landmarks
