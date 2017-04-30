@@ -12,7 +12,7 @@ class WorkerThread : public QThread
 public:
     WorkerThread(QObject *parent = 0);
     ~WorkerThread();
-    void runrun();
+    void runrun(QString input, int dim, double th, double perp, unsigned int binbin, int pm, int rseed);
 
 protected:
     void run() override;
@@ -24,6 +24,7 @@ private:
     int     origN;
     int     N;
     int     D;
+
     int     no_dims;
     double  perplexity;
     double  theta;
@@ -37,5 +38,6 @@ private:
     PixelSNE* pixelsne;
     bool restart;
     QWaitCondition condition;
+    QString inputLoc;
 };
 #endif

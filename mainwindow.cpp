@@ -6,6 +6,8 @@
 #include <QtWidgets>
 #include <QPushButton>
 #include "workerthread.h"
+#include <iostream>
+#include <string>
 
 MainWindow::MainWindow()
 {
@@ -18,9 +20,9 @@ MainWindow::MainWindow()
     QObject::connect(button, SIGNAL(clicked()),this, SLOT(startPixelSNE()));
     QWidget *formGroupBox = new QWidget;
     QFormLayout *layout = new QFormLayout;
-    QLineEdit* QinputLocation = new QLineEdit("");
+    QinputLocation = new QLineEdit("");
     QinputLocation->setText("data.dat");
-    QLineEdit* QoutputLocation = new QLineEdit("");
+    QoutputLocation = new QLineEdit("");
     QoutputLocation->setText("out");
     Qtheta = new QDoubleSpinBox();
     Qtheta->setValue(0.5);
@@ -96,8 +98,6 @@ void MainWindow::setSamples(double* Y, int N, int no_dims)
 
 void MainWindow::startPixelSNE()
 {
-
-//    printf("%s\n", QinputLocation->text().toUtf8().constData());
     if(thread != NULL && thread->isRunning()) {
         QMessageBox msgBox;
         msgBox.setWindowTitle("Wait!");
@@ -107,6 +107,6 @@ void MainWindow::startPixelSNE()
         thread = new WorkerThread;
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(/*QinputLocation->text().toUtf8().constData()*/);
+        thread->runrun(QinputLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbin->value(), Qp_method->value(), 30);
     }
 }
