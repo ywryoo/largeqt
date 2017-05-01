@@ -13,6 +13,8 @@ INCLUDEPATH += $${QWT_ROOT}/src
 DEPENDPATH  += $${QWT_ROOT}/src
 
 QT += widgets core
+QMAKE_CFLAGS	+=  -ffast-math -march=native -Ofast
+QMAKE_CXXFLAGS	+=  -ffast-math -march=native -Ofast
 
 !debug_and_release {
 
@@ -66,6 +68,10 @@ macx {
    LIBS += -L/usr/local/lib
    INCLUDEPATH += /usr/local/include
 }
+
+linux {
+    INCLUDEPATH += /usr/include/boost
+}
 CONFIG += qwt
 CONFIG += c++11
 
@@ -84,12 +90,13 @@ HEADERS = \
     workerthread.h \
     neighborthread.h
 
-
-
 LIBS += -lm
 LIBS += -pthread
 LIBS += -lgsl
 LIBS += -lgslcblas
+LIBS += -lboost_thread 
+LIBS += -lboost_system
+
 
 SOURCES = \
     main.cpp \
