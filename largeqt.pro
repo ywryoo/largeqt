@@ -67,10 +67,14 @@ win32 {
 macx {
    LIBS += -L/usr/local/lib
    INCLUDEPATH += /usr/local/include
+    LIBS += -lboost_thread-mt
+    LIBS += -lboost_system-mt
 }
 
 linux {
     INCLUDEPATH += /usr/include/boost
+    LIBS += -lboost_thread 
+    LIBS += -lboost_system
 }
 CONFIG += qwt
 CONFIG += c++11
@@ -95,8 +99,7 @@ LIBS += -lm
 LIBS += -pthread
 LIBS += -lgsl
 LIBS += -lgslcblas
-LIBS += -lboost_thread 
-LIBS += -lboost_system
+
 
 
 SOURCES = \
