@@ -67,9 +67,9 @@ Plot::Plot( QWidget *parent ):
     magnifier->setMouseButton( Qt::NoButton );
 
     // distanve measurement with the right mouse button
-    DistancePicker *picker = new DistancePicker( canvas() );
-    picker->setMousePattern( QwtPlotPicker::MouseSelect1, Qt::RightButton );
-    picker->setRubberBandPen( QPen( Qt::blue ) );
+    //DistancePicker *picker = new DistancePicker( canvas() );
+    //picker->setMousePattern( QwtPlotPicker::MouseSelect1, Qt::RightButton );
+    //picker->setRubberBandPen( QPen( Qt::blue ) );
 }
 
 void Plot::setSymbol( QwtSymbol *symbol )

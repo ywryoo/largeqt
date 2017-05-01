@@ -4,6 +4,7 @@
 #include <QThread>
 #include <QWaitCondition>
 #include "pixelsne/pixelsne.h"
+#include "neighborthread.h"
 
 class WorkerThread : public QThread
 {
@@ -13,7 +14,7 @@ public:
     WorkerThread(QObject *parent = 0);
     ~WorkerThread();
     void runrun(QString input, int dim, double th, double perp, unsigned int binbin, int pm, int rseed);
-
+    void stopWorkers();
 protected:
     void run() override;
 
@@ -39,5 +40,6 @@ private:
     bool restart;
     QWaitCondition condition;
     QString inputLoc;
+    NeighborThread* nthread;
 };
 #endif

@@ -22,8 +22,10 @@ public:
 private slots:
     void setSamples(double*, int, int);
     void startPixelSNE();
+    void restartPixelSNE();
     void setConsoleText(const QString text);
 private:
+    QPushButton *startButton;
     QLabel *createLabel(const QString &text);
     QLabel *consoleLabel;
     QLineEdit* QinputLocation;
@@ -32,7 +34,7 @@ private:
     QSpinBox* Qperplexity;
     QSpinBox* Qno_dims;
     QSpinBox* Qp_method;
-    QSpinBox* Qbin;
+    QSpinBox* Qbins;
     WorkerThread *thread;
     Plot *d_plot;
 };
