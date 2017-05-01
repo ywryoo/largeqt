@@ -13,8 +13,9 @@ class WorkerThread : public QThread
 public:
     WorkerThread(QObject *parent = 0);
     ~WorkerThread();
-    void runrun(QString input, int dim, double th, double perp, unsigned int binbin, int pm, int rseed);
+    void runrun(QString input, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined);
     void stopWorkers();
+    bool initDone();
 protected:
     void run() override;
 
@@ -25,8 +26,10 @@ private:
     int     origN;
     int     N;
     int     D;
-
+    int     n_threads;
     int     no_dims;
+    bool pipelineEnabled;
+    bool isInitDone;
     double  perplexity;
     double  theta;
     double* data;
@@ -37,7 +40,6 @@ private:
     int stop_lying_iter;
     int mom_switch_iter;
     PixelSNE* pixelsne;
-    bool restart;
     QWaitCondition condition;
     QString inputLoc;
     NeighborThread* nthread;

@@ -6,7 +6,7 @@
 WorkerThread::WorkerThread(QObject *parent): QThread(parent)
 {
     inputLoc = QString::fromLocal8Bit("data.dat");
-    restart = false;
+    isInitDone = false;
     rand_seed = 30;
     max_iter=1000;
     stop_lying_iter=250;
@@ -29,7 +29,7 @@ WorkerThread::~WorkerThread()
 }
 
 
-void WorkerThread::runrun(QString input, int dim, double th, double perp, unsigned int binbin, int pm, int rseed)
+void WorkerThread::runrun(QString input, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined)
 {
     inputLoc = input;
     no_dims = dim;
@@ -38,7 +38,9 @@ void WorkerThread::runrun(QString input, int dim, double th, double perp, unsign
     bins = binbin;
     p_method = pm;
     rand_seed = rseed;
-    
+    n_threads = threads;
+    pipelineEnabled = isPipelined;
+
    if (!isRunning()) {
         start(LowPriority);
     }/* else {
@@ -61,16 +63,25 @@ void WorkerThread::run()
 {
     pixelsne = new PixelSNE();
 
-    //temp vals for dump value
-    int tempint;
-    int tempint2;
-    int tempint3;
-    double tempdouble;
-    double tempdouble2;
-    unsigned int tempuint;
+    if(inputLoc.contains(".dat",Qt::CaseInsensitive))
+    {
+        //temp vals for dump value
+        int tempint;
+        int tempint2;
+        int tempint3;
+        double tempdouble;
+        double tempdouble2;
+        unsigned int tempuint;
 
-    // Read the parameters and the dataset
-    pixelsne->load_data(inputLoc.toUtf8().constData(), &data, &origN, &D, &tempint, &tempdouble, &tempdouble2, &tempuint, &tempint2, &tempint3);
+        // Read the parameters and the dataset
+        pixelsne->load_data(inputLoc.toUtf8().constData(), &data, &origN, &D, &tempint, &tempdouble, &tempdouble2, &tempuint, &tempint2, &tempint3);
+    }
+    else
+    {
+        // Load data from txt file like largevis
+        pixelsne->load_data(inputLoc.toUtf8().constData(), &data, &origN, &D);
+
+    }
 
     sendLog(QString("Data(%1, %2 dimension) Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));
 
@@ -86,13 +97,17 @@ void WorkerThread::run()
     if(Y == NULL || costs == NULL) { printf("Memory allocation failed!\n"); exit(1); }
 
     //run RP Tree ONLY
-    pixelsne->run(data, N, D, Y, no_dims, perplexity, theta, bins, p_method, rand_seed, false, max_iter, stop_lying_iter, mom_switch_iter);
+    pixelsne->run(data, N, D, Y, no_dims, perplexity, theta, bins, p_method, rand_seed, n_threads, false, max_iter, stop_lying_iter, mom_switch_iter);
     sendLog("Initialized.");
 
+    isInitDone = true;
     //run background threads for neighbor exploring
     nthread = new NeighborThread;
     nthread->runrun(pixelsne);
-    //nthread->wait(); //Uncomment if neighbor exploring is done before visualization
+    if(!pipelineEnabled)
+    {
+        nthread->wait(); //Neighbor exploring will be done before visualization
+    }
 
     //TODO max_iter should come from pixelsne
     for(int iter = 0; iter < max_iter; iter++) {
@@ -106,4 +121,9 @@ void WorkerThread::run()
     }
 
     sendLog("Gradient Descent is done.");
+}
+
+bool WorkerThread::initDone()
+{
+    return isInitDone;
 }

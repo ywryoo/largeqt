@@ -34,6 +34,8 @@ private:
     QSpinBox* Qperplexity;
     QSpinBox* Qno_dims;
     QSpinBox* Qp_method;
+    QSpinBox* Qn_threads;
+    QCheckBox* QPipelining;
     QSpinBox* Qbins;
     WorkerThread *thread;
     Plot *d_plot;

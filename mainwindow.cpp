@@ -46,6 +46,14 @@ MainWindow::MainWindow()
     Qp_method = new QSpinBox();
     Qp_method->setValue(0);
 
+    //n_threads
+    Qn_threads = new QSpinBox();
+    Qn_threads->setValue(4);
+
+    //pipelining
+    QPipelining = new QCheckBox();
+    QPipelining->setChecked(true);
+
     //bins
     Qbins = new QSpinBox();
     Qbins->setMaximum(10000);
@@ -58,13 +66,15 @@ MainWindow::MainWindow()
     layout->addRow(new QLabel(tr("perplexity")), Qperplexity);
     layout->addRow(new QLabel(tr("no_dims")), Qno_dims);
     layout->addRow(new QLabel(tr("p_method")), Qp_method);
+    layout->addRow(new QLabel(tr("n_threads")), Qn_threads);
+    layout->addRow(new QLabel(tr("pipelining")), QPipelining);    
     layout->addRow(new QLabel(tr("bins")), Qbins);
     layout->addRow(startButton);
     layout->addRow(restartButton);
     formGroupBox->setLayout(layout);
 
     //console label
-    consoleLabel = createLabel("click Run to start visualization.");
+    consoleLabel = createLabel("Click Start button to start visualization.");
 
     //main layout
     BorderLayout *mainLayout = new BorderLayout;
@@ -126,20 +136,31 @@ void MainWindow::startPixelSNE()
         thread = new WorkerThread;
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QinputLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30);
+        thread->runrun(QinputLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30, Qn_threads->value(), QPipelining->isChecked());
     }
 }
 
 void MainWindow::restartPixelSNE()
 {
     if(thread != NULL && thread->isRunning()) {
-        thread->stopWorkers();
-        thread->terminate();
-        thread->wait();
-        thread = NULL;
+        if(thread->initDone())
+        {
+            thread->stopWorkers();
+            thread->terminate();
+            thread->wait();
+            thread = NULL;
+        }
+        else
+        {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Wait!");
+            msgBox.setText("Try after initialization");
+            msgBox.exec();
+            return;
+        }
     }
     thread = new WorkerThread;
     connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
     connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-    thread->runrun(QinputLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30);
+    thread->runrun(QinputLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30, Qn_threads->value(), QPipelining->isChecked());
 }
