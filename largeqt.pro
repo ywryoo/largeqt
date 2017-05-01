@@ -88,7 +88,8 @@ HEADERS = \
     pixelsne/vptree.h \
     borderlayout.h \
     workerthread.h \
-    neighborthread.h
+    neighborthread.h \
+    huecolormap.h
 
 LIBS += -lm
 LIBS += -pthread

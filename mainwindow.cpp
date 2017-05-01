@@ -30,6 +30,10 @@ MainWindow::MainWindow()
     QinputLocation = new QLineEdit("");
     QinputLocation->setText("data.dat");
 
+    //label
+    QlabelLocation = new QLineEdit("");
+    QlabelLocation->setText("");
+
     //theta
     Qtheta = new QDoubleSpinBox();
     Qtheta->setValue(0.5);
@@ -62,6 +66,7 @@ MainWindow::MainWindow()
 
     //add boxes to panel
     layout->addRow(new QLabel(tr("Input Location")), QinputLocation);
+    layout->addRow(new QLabel(tr("Label Location")), QlabelLocation);    
     layout->addRow(new QLabel(tr("theta")), Qtheta);
     layout->addRow(new QLabel(tr("perplexity")), Qperplexity);
     layout->addRow(new QLabel(tr("no_dims")), Qno_dims);
@@ -93,7 +98,7 @@ MainWindow::MainWindow()
 MainWindow::~MainWindow()
 {
     if(d_plot != NULL) free(d_plot); d_plot=NULL;
-    if(thread != NULL && thread->isRunning()) thread->exit();
+    if(thread != NULL && thread->isRunning()) thread->terminate(); thread->wait();
 }
 
 QLabel *MainWindow::createLabel(const QString &text)
@@ -110,19 +115,36 @@ void MainWindow::setConsoleText(const QString text)
 
 void MainWindow::setSamples(double* Y, int N, int no_dims)
 {
-    //TODO read label
-    QPolygonF samples;
-    if(no_dims == 2) {
-        for ( long long i = 0; i < N; i++ )
-        {
+    if(data_labels != NULL)
+    {
+        d_plot->setSamplesWithLabels(Y, data_labels, N, no_dims);
+        d_plot->replot();
+    }
+    else
+    {
+        QPolygonF samples;
+        if(no_dims == 2) {
+            for ( long long i = 0; i < N; i++ )
+            {
+                samples += QPointF(Y[i*no_dims],Y[i*no_dims+1] );
+            }
 
-            samples += QPointF(Y[i*no_dims],Y[i*no_dims+1] );
         }
 
+        d_plot->setSamples( samples );
+        d_plot->replot();
     }
 
-    d_plot->setSamples( samples );
-    d_plot->replot();
+}
+
+void MainWindow::setLabels(int* labels, int N)
+{
+    data_labels = labels;
+    int max = 0;
+    for(int i = 0; i< N; i++)
+        if(max < data_labels[i])
+            max = data_labels[i];
+    d_plot->setLabels(max+1);
 }
 
 void MainWindow::startPixelSNE()
@@ -134,9 +156,10 @@ void MainWindow::startPixelSNE()
         msgBox.exec();
     } else {
         thread = new WorkerThread;
+        connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QinputLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30, Qn_threads->value(), QPipelining->isChecked());
+        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30, Qn_threads->value(), QPipelining->isChecked());
     }
 }
 
@@ -161,6 +184,7 @@ void MainWindow::restartPixelSNE()
     }
     thread = new WorkerThread;
     connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
+    connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
     connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-    thread->runrun(QinputLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30, Qn_threads->value(), QPipelining->isChecked());
+    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30, Qn_threads->value(), QPipelining->isChecked());
 }

@@ -13,13 +13,14 @@ class WorkerThread : public QThread
 public:
     WorkerThread(QObject *parent = 0);
     ~WorkerThread();
-    void runrun(QString input, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined);
+    void runrun(QString input, QString label, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined);
     void stopWorkers();
     bool initDone();
 protected:
     void run() override;
 
 signals:
+    void updateLabels(int* labels, int N);
     void updatePoints(double* Y, int N, int no_dims);
     void sendLog(QString text);
 private:
@@ -33,6 +34,7 @@ private:
     double  perplexity;
     double  theta;
     double* data;
+    int* labels;
     unsigned int bins;
     int     p_method;
     int rand_seed;
@@ -42,6 +44,8 @@ private:
     PixelSNE* pixelsne;
     QWaitCondition condition;
     QString inputLoc;
+    QString labelLoc;
     NeighborThread* nthread;
+    void loadLabels(int NN);
 };
 #endif

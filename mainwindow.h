@@ -21,6 +21,7 @@ public:
 
 private slots:
     void setSamples(double*, int, int);
+    void setLabels(int*,int);
     void startPixelSNE();
     void restartPixelSNE();
     void setConsoleText(const QString text);
@@ -29,7 +30,7 @@ private:
     QLabel *createLabel(const QString &text);
     QLabel *consoleLabel;
     QLineEdit* QinputLocation;
-    QLineEdit* QoutputLocation;
+    QLineEdit* QlabelLocation;
     QDoubleSpinBox* Qtheta;
     QSpinBox* Qperplexity;
     QSpinBox* Qno_dims;
@@ -37,7 +38,8 @@ private:
     QSpinBox* Qn_threads;
     QCheckBox* QPipelining;
     QSpinBox* Qbins;
-    WorkerThread *thread;
+    WorkerThread *thread = NULL;
     Plot *d_plot;
+    int *data_labels = NULL;
 };
 #endif

@@ -4,6 +4,9 @@
 #include <qwt_plot_picker.h>
 #include <qwt_picker_machine.h>
 #include <qwt_plot_curve.h>
+#include <qwt_color_map.h>
+#include <qwt_legend.h>
+#include "huecolormap.h"
 
 class DistancePicker: public QwtPlotPicker
 {
@@ -38,7 +41,7 @@ public:
 
 Plot::Plot( QWidget *parent ):
     QwtPlot( parent ),
-    d_curve( NULL )
+    default_curve( NULL )
 {
     canvas()->setStyleSheet(
         "border: 2px solid Black;"
@@ -46,16 +49,18 @@ Plot::Plot( QWidget *parent ):
         "background-color: qlineargradient( x1: 0, y1: 0, x2: 0, y2: 1,"
             "stop: 0 LemonChiffon, stop: 1 PaleGoldenrod );"
     );
+    QwtLegend *legend = new QwtLegend;
+    legend->setDefaultItemMode( QwtLegendData::Checkable );
+    insertLegend( legend, QwtPlot::RightLegend );
 
     // attach curve
-    d_curve = new QwtPlotCurve( "Scattered Points" );
-    d_curve->setPen( QColor( "Purple" ) );
+    default_curve = new QwtPlotCurve( "Scattered Points" );
+    default_curve->setPen( QColor( "Purple" ) );
 
     // when using QwtPlotCurve::ImageBuffer simple dots can be
     // rendered in parallel on multicore systems.
-    d_curve->setRenderThreadCount( 0 ); // 0: use QThread::idealThreadCount()
+    default_curve->setRenderThreadCount( 0 ); // 0: use QThread::idealThreadCount()
 
-    d_curve->attach( this );
 
     setSymbol( NULL );
 
@@ -74,18 +79,57 @@ Plot::Plot( QWidget *parent ):
 
 void Plot::setSymbol( QwtSymbol *symbol )
 {
-    d_curve->setSymbol( symbol );
+    default_curve->setSymbol( symbol );
 
     if ( symbol == NULL )
     {
-        d_curve->setStyle( QwtPlotCurve::Dots );
+        default_curve->setStyle( QwtPlotCurve::Dots );
     }
 }
 
 void Plot::setSamples( const QVector<QPointF> &samples )
 {
-    d_curve->setPaintAttribute( 
+
+    default_curve->attach( this );
+
+    default_curve->setPaintAttribute( 
         QwtPlotCurve::ImageBuffer, samples.size() > 1000 );
 
-    d_curve->setSamples( samples );
+    default_curve->setSamples( samples );
+}
+
+void Plot::setLabels(int max)
+{
+    label_num = max;
+    d_curves = new QwtPlotCurve*[label_num];
+	QwtInterval a = QwtInterval(0,label_num);
+    HueColorMap *aa = new HueColorMap;
+    for(int i = 0; i < label_num; i++)
+    {
+        d_curves[i] = new QwtPlotCurve(QString("%1").arg(QString::number(i)));
+        QColor bb = aa->color(a, i);
+        d_curves[i]->setPen( bb );
+        d_curves[i]->setStyle( QwtPlotCurve::Dots );
+        d_curves[i]->setPaintAttribute( 
+            QwtPlotCurve::ImageBuffer, true );
+        // when using QwtPlotCurve::ImageBuffer simple dots can be
+        // rendered in parallel on multicore systems.
+        d_curves[i]->setRenderThreadCount( 0 ); // 0: use QThread::idealThreadCount()
+
+        d_curves[i]->attach( this );
+    }
+}
+
+void Plot::setSamplesWithLabels(double* Y, int* data_labels, int N, int no_dims)
+{
+        QPolygonF samples[label_num];
+        for(int i = 0; i < label_num; i++) samples[i] = QPolygonF();
+        if(no_dims == 2) {
+            for ( long long i = 0; i < N; i++ )
+            {
+                samples[data_labels[i]] += QPointF(Y[i*no_dims],Y[i*no_dims+1] );
+            }
+
+        }
+        for(int i = 0; i < label_num; i++) d_curves[i]->setSamples(samples[i]);
 }

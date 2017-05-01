@@ -2,6 +2,8 @@
 #include "neighborthread.h"
 #include "pixelsne/pixelsne.h"
 #include <QtWidgets>
+#include <stdlib.h>
+#include <stdio.h>
 
 WorkerThread::WorkerThread(QObject *parent): QThread(parent)
 {
@@ -11,7 +13,7 @@ WorkerThread::WorkerThread(QObject *parent): QThread(parent)
     max_iter=1000;
     stop_lying_iter=250;
     mom_switch_iter=250;
-
+    labels=NULL;
 }
 
 WorkerThread::~WorkerThread()
@@ -25,13 +27,15 @@ WorkerThread::~WorkerThread()
         nthread->wait();
         nthread=NULL;
     }
+    if(labels != NULL) free(labels); labels=NULL;
 
 }
 
 
-void WorkerThread::runrun(QString input, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined)
+void WorkerThread::runrun(QString input, QString label, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined)
 {
     inputLoc = input;
+    labelLoc = label;
     no_dims = dim;
     theta = th;
     perplexity = perp;
@@ -83,9 +87,16 @@ void WorkerThread::run()
 
     }
 
-    sendLog(QString("Data(%1, %2 dimension) Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));
-
     N = origN;
+    if(!labelLoc.isEmpty()){
+        loadLabels(N);
+        sendLog(QString("Data(%1, %2 dimension) with labels are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));       
+    }
+    else
+    {
+        sendLog(QString("Data(%1, %2 dimension) are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));
+
+    }
 
     // Make dummy landmarks
     int* landmarks = (int*) malloc(N * sizeof(int));
@@ -122,6 +133,29 @@ void WorkerThread::run()
 
     sendLog("Gradient Descent is done.");
 }
+
+void WorkerThread::loadLabels(int NN)
+{
+
+    int res = -1;
+
+	FILE *fin = fopen(labelLoc.toUtf8().constData(), "rb");
+	if (fin == NULL)
+	{
+        labels = NULL;
+		printf("\nFile not found!\n");
+		return;
+	}
+    printf("Reading label file %s ......\n", labelLoc.toUtf8().constData());
+    labels = (int *) malloc(NN * sizeof(int));
+	for (long long i = 0; i < NN; ++i)
+        res = fscanf(fin, "%d", &labels[i]);
+	fclose(fin);
+    emit updateLabels(labels, NN);
+    printf("Label file is loaded.\n");
+}
+
+
 
 bool WorkerThread::initDone()
 {
