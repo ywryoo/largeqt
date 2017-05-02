@@ -28,11 +28,11 @@ MainWindow::MainWindow()
 
     //input
     QinputLocation = new QLineEdit("");
-    QinputLocation->setText("data.dat");
+    QinputLocation->setText("data.txt");
 
     //label
     QlabelLocation = new QLineEdit("");
-    QlabelLocation->setText("");
+    QlabelLocation->setText("label.txt");
 
     //theta
     Qtheta = new QDoubleSpinBox();
@@ -41,6 +41,15 @@ MainWindow::MainWindow()
     //perplexity
     Qperplexity = new QSpinBox();
     Qperplexity->setValue(50);
+
+    //rand_seed
+    Qrand_seed = new QSpinBox();
+    Qrand_seed->setMinimum(-1);
+    Qrand_seed->setValue(30);
+
+    //rand_init
+    Qrand_init = new QCheckBox();
+    Qrand_init->setChecked(false);
 
     //no_dims
     Qno_dims = new QSpinBox();
@@ -69,6 +78,8 @@ MainWindow::MainWindow()
     layout->addRow(new QLabel(tr("Label Location")), QlabelLocation);    
     layout->addRow(new QLabel(tr("theta")), Qtheta);
     layout->addRow(new QLabel(tr("perplexity")), Qperplexity);
+    layout->addRow(new QLabel(tr("rand_seed")), Qrand_seed);
+    layout->addRow(new QLabel(tr("skip_rand_init")), Qrand_init);
     layout->addRow(new QLabel(tr("no_dims")), Qno_dims);
     layout->addRow(new QLabel(tr("p_method")), Qp_method);
     layout->addRow(new QLabel(tr("n_threads")), Qn_threads);
@@ -159,7 +170,7 @@ void MainWindow::startPixelSNE()
         connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30, Qn_threads->value(), QPipelining->isChecked());
+        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30, Qn_threads->value(), QPipelining->isChecked(),Qrand_init->isChecked());
     }
 }
 
@@ -186,5 +197,5 @@ void MainWindow::restartPixelSNE()
     connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
     connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
     connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), 30, Qn_threads->value(), QPipelining->isChecked());
+    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qrand_init->isChecked());
 }

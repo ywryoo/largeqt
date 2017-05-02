@@ -32,7 +32,7 @@ WorkerThread::~WorkerThread()
 }
 
 
-void WorkerThread::runrun(QString input, QString label, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined)
+void WorkerThread::runrun(QString input, QString label, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isRandInit)
 {
     inputLoc = input;
     labelLoc = label;
@@ -42,6 +42,7 @@ void WorkerThread::runrun(QString input, QString label, int dim, double th, doub
     bins = binbin;
     p_method = pm;
     rand_seed = rseed;
+    rand_init = isRandInit;
     n_threads = threads;
     pipelineEnabled = isPipelined;
 
@@ -66,6 +67,7 @@ void WorkerThread::stopWorkers()
 void WorkerThread::run()
 {
     pixelsne = new PixelSNE();
+    sendLog("Loading Data..");
 
     if(inputLoc.contains(".dat",Qt::CaseInsensitive))
     {
@@ -108,7 +110,7 @@ void WorkerThread::run()
     if(Y == NULL || costs == NULL) { printf("Memory allocation failed!\n"); exit(1); }
 
     //run RP Tree ONLY
-    pixelsne->run(data, N, D, Y, no_dims, perplexity, theta, bins, p_method, rand_seed, n_threads, false, max_iter, stop_lying_iter, mom_switch_iter);
+    pixelsne->run(data, N, D, Y, no_dims, perplexity, theta, bins, p_method, rand_seed, n_threads, rand_init, max_iter, stop_lying_iter, mom_switch_iter);
     sendLog("Initialized.");
 
     isInitDone = true;

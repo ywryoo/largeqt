@@ -13,7 +13,7 @@ class WorkerThread : public QThread
 public:
     WorkerThread(QObject *parent = 0);
     ~WorkerThread();
-    void runrun(QString input, QString label, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined);
+    void runrun(QString input, QString label, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit);
     void stopWorkers();
     bool initDone();
 protected:
@@ -31,6 +31,7 @@ private:
     int     no_dims;
     bool pipelineEnabled;
     bool isInitDone;
+    bool rand_init;
     double  perplexity;
     double  theta;
     double* data;

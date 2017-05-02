@@ -33,10 +33,12 @@ private:
     QLineEdit* QlabelLocation;
     QDoubleSpinBox* Qtheta;
     QSpinBox* Qperplexity;
+    QSpinBox* Qrand_seed;
     QSpinBox* Qno_dims;
     QSpinBox* Qp_method;
     QSpinBox* Qn_threads;
     QCheckBox* QPipelining;
+    QCheckBox* Qrand_init;
     QSpinBox* Qbins;
     WorkerThread *thread = NULL;
     Plot *d_plot;
