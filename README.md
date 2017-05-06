@@ -4,7 +4,7 @@
 
 ### Mac
 
-1. install brew
+1. install homebrew
 2. install gsl, qwt, qt from brew
 ```bash
 brew install gsl qwt qt
@@ -12,9 +12,13 @@ brew install gsl qwt qt
 3. set QWT_PATH in largeqt.pro if path is changed.
 4. link libraries(see [this link](http://stackoverflow.com/questions/18588418/install-and-use-qwt-under-mac-os-x) if you encounter a problem)
 5. `qmake largeqt.pro`
-6. `./scatterplot -input ~/largeqt/LargeVis/Examples/CondMat/CondMat_network.txt -output out -fea 0`
+6. `cd ./bin/scatterplot.app/Conetents/MacOS && ./scatterplot`
 
-### Linux
+### Linux(Ubuntu)
+1. install qt5, gsl and qwt
+3. set QWT_PATH in largeqt.pro if path is changed.
+5. `qmake largeqt.pro`
+6. `cd ./bin && ./scatterplot`
 
 
 ## Usage
