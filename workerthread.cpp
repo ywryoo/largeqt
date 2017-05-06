@@ -92,22 +92,22 @@ void WorkerThread::run()
     N = origN;
     if(!labelLoc.isEmpty()){
         loadLabels(N);
-        sendLog(QString("Data(%1, %2 dimension) with labels are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));       
+        sendLog(QString("Data(%1, %2D) with labels are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));       
     }
     else
     {
-        sendLog(QString("Data(%1, %2 dimension) are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));
+        sendLog(QString("Data(%1, %2D) are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));
 
     }
 
     // Make dummy landmarks
     int* landmarks = (int*) malloc(N * sizeof(int));
-    if(landmarks == NULL) { printf("Memory allocation failed!\n"); exit(1); }
+    if(landmarks == NULL) { printf("LargeQT: Memory allocation failed!\n"); exit(1); }
     for(int n = 0; n < N; n++) landmarks[n] = n;
 
     double* Y = (double*) malloc(N * no_dims * sizeof(double));
     double* costs = (double*) calloc(N, sizeof(double));
-    if(Y == NULL || costs == NULL) { printf("Memory allocation failed!\n"); exit(1); }
+    if(Y == NULL || costs == NULL) { printf("LargeQT: Memory allocation failed!\n"); exit(1); }
 
     //run RP Tree ONLY
     pixelsne->run(data, N, D, Y, no_dims, perplexity, theta, bins, p_method, rand_seed, n_threads, rand_init, max_iter, stop_lying_iter, mom_switch_iter);
@@ -145,16 +145,16 @@ void WorkerThread::loadLabels(int NN)
 	if (fin == NULL)
 	{
         labels = NULL;
-		printf("\nFile not found!\n");
+		printf("\nLargeQT: File not found!\n");
 		return;
 	}
-    printf("Reading label file %s ......\n", labelLoc.toUtf8().constData());
+    printf("LargeQT: Reading label file %s ......\n", labelLoc.toUtf8().constData());
     labels = (int *) malloc(NN * sizeof(int));
 	for (long long i = 0; i < NN; ++i)
         res = fscanf(fin, "%d", &labels[i]);
 	fclose(fin);
     emit updateLabels(labels, NN);
-    printf("Label file is loaded.\n");
+    printf("LargeQT: Label file is loaded.\n");
 }
 
 
