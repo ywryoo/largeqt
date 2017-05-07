@@ -133,7 +133,7 @@ void WorkerThread::run()
         emit updatePoints(Y, N, no_dims);
     }
 
-    sendLog("Gradient Descent is done.");
+    sendLog("Done.");
 }
 
 void WorkerThread::loadLabels(int NN)
