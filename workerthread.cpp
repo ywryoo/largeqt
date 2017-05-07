@@ -125,11 +125,14 @@ void WorkerThread::run()
 
     isInitDone = true;
     //run background threads for neighbor exploring
-    nthread = new NeighborThread;
-    nthread->runrun(pixelsne);
-    if(!pipelineEnabled)
+    if(p_method == 0)
     {
-        nthread->wait(); //Neighbor exploring will be done before visualization
+        nthread = new NeighborThread;
+        nthread->runrun(pixelsne);
+        if(!pipelineEnabled)
+        {
+            nthread->wait(); //Neighbor exploring will be done before visualization
+        }
     }
 
     //TODO max_iter should come from pixelsne
