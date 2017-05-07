@@ -42,11 +42,12 @@ private:
     QDoubleSpinBox* Qtheta;
     QSpinBox* Qperplexity;
     QSpinBox* Qrand_seed;
-    QSpinBox* Qno_dims;
+    QSpinBox* Qn_rptrees;
+    QSpinBox* Qn_propagations;
     QSpinBox* Qp_method;
     QSpinBox* Qn_threads;
     QCheckBox* QPipelining;
-    QCheckBox* Qrand_init;
+    QCheckBox* Qknn_validation;
     QSpinBox* Qbins;
     WorkerThread *thread = NULL;
     Plot *d_plot;

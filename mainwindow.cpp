@@ -50,18 +50,23 @@ MainWindow::MainWindow()
     Qperplexity = new QSpinBox();
     Qperplexity->setValue(50);
 
+    //RP Tree numbers
+    Qn_rptrees = new QSpinBox();
+    Qn_rptrees->setMinimum(-1);
+    Qn_rptrees->setValue(-1);
+
     //rand_seed
     Qrand_seed = new QSpinBox();
     Qrand_seed->setMinimum(-1);
     Qrand_seed->setValue(30);
 
     //rand_init
-    Qrand_init = new QCheckBox();
-    Qrand_init->setChecked(false);
+    Qknn_validation = new QCheckBox();
+    Qknn_validation->setChecked(true);
 
-    //no_dims
-    Qno_dims = new QSpinBox();
-    Qno_dims->setValue(2);
+    //n_propagations
+    Qn_propagations = new QSpinBox();
+    Qn_propagations->setValue(3);
 
     //p_method
     Qp_method = new QSpinBox();
@@ -86,9 +91,10 @@ MainWindow::MainWindow()
     layout->addRow(new QLabel(tr("Label Location")), QlabelLocation);    
     layout->addRow(new QLabel(tr("theta")), Qtheta);
     layout->addRow(new QLabel(tr("perplexity")), Qperplexity);
+    layout->addRow(new QLabel(tr("n_rptrees")), Qn_rptrees);
     layout->addRow(new QLabel(tr("rand_seed")), Qrand_seed);
-    layout->addRow(new QLabel(tr("skip_rand_init")), Qrand_init);
-    layout->addRow(new QLabel(tr("no_dims")), Qno_dims);
+    layout->addRow(new QLabel(tr("knn_validation")), Qknn_validation);
+    layout->addRow(new QLabel(tr("n_propagations")), Qn_propagations);
     layout->addRow(new QLabel(tr("p_method")), Qp_method);
     layout->addRow(new QLabel(tr("n_threads")), Qn_threads);
     layout->addRow(new QLabel(tr("pipelining")), QPipelining);    
@@ -178,7 +184,7 @@ void MainWindow::startPixelSNE()
         connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qrand_init->isChecked());
+        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value());
     }
 }
 
@@ -205,5 +211,5 @@ void MainWindow::restartPixelSNE()
     connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
     connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
     connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qno_dims->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qrand_init->isChecked());
+    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value());
 }

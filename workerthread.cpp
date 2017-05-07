@@ -21,6 +21,7 @@ WorkerThread::WorkerThread(QObject *parent): QThread(parent)
     max_iter=1000;
     stop_lying_iter=250;
     mom_switch_iter=250;
+    n_propagations = 3;
     labels=NULL;
 }
 
@@ -40,19 +41,20 @@ WorkerThread::~WorkerThread()
 }
 
 
-void WorkerThread::runrun(QString input, QString label, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isRandInit)
+void WorkerThread::runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees)
 {
     inputLoc = input;
     labelLoc = label;
-    no_dims = dim;
+    n_propagations = propagation_num;
     theta = th;
     perplexity = perp;
     bins = binbin;
     p_method = pm;
     rand_seed = rseed;
-    rand_init = isRandInit;
+    knn_validation = isValidation;
     n_threads = threads;
     pipelineEnabled = isPipelined;
+    n_trees = n_rptrees;
 
    if (!isRunning()) {
         start(LowPriority);
@@ -113,12 +115,12 @@ void WorkerThread::run()
     if(landmarks == NULL) { printf("LargeQT: Memory allocation failed!\n"); exit(1); }
     for(int n = 0; n < N; n++) landmarks[n] = n;
 
-    double* Y = (double*) malloc(N * no_dims * sizeof(double));
+    double* Y = (double*) malloc(N * 2 * sizeof(double));
     double* costs = (double*) calloc(N, sizeof(double));
     if(Y == NULL || costs == NULL) { printf("LargeQT: Memory allocation failed!\n"); exit(1); }
 
     //run RP Tree ONLY
-    pixelsne->run(data, N, D, Y, no_dims, perplexity, theta, bins, p_method, rand_seed, n_threads, rand_init, max_iter, stop_lying_iter, mom_switch_iter);
+    pixelsne->run(data, N, D, Y, 2, perplexity, theta, bins, p_method, rand_seed, n_threads, n_propagations, false, n_trees, knn_validation, max_iter, stop_lying_iter, mom_switch_iter);
     sendLog("Initialized.");
 
     isInitDone = true;
@@ -131,14 +133,14 @@ void WorkerThread::run()
     }
 
     //TODO max_iter should come from pixelsne
-    for(int iter = 0; iter < max_iter; iter++) {
+    for(int iter = 0; iter < pixelsne->get_max_iter(); iter++) {
         //a gradient descent
-        pixelsne->updatePoints(Y, N, no_dims, theta, bins, iter, stop_lying_iter, mom_switch_iter, max_iter);
+        pixelsne->updatePoints(Y, N, 2, theta, bins, iter, stop_lying_iter, mom_switch_iter, max_iter);
         
         sendLog(QString("Gradient Descent is running - %1/%2").arg(QString::number(iter+1),QString::number(max_iter)));
         
         //visualizing points
-        emit updatePoints(Y, N, no_dims);
+        emit updatePoints(Y, N, 2);
     }
 
     sendLog("Done.");

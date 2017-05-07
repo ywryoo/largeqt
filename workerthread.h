@@ -21,7 +21,7 @@ class WorkerThread : public QThread
 public:
     WorkerThread(QObject *parent = 0);
     ~WorkerThread();
-    void runrun(QString input, QString label, int dim, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit);
+    void runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees);
     void stopWorkers();
     bool initDone();
 protected:
@@ -36,10 +36,10 @@ private:
     int     N;
     int     D;
     int     n_threads;
-    int     no_dims;
+    int     n_propagations;
     bool pipelineEnabled;
     bool isInitDone;
-    bool rand_init;
+    bool knn_validation;
     double  perplexity;
     double  theta;
     double* data;
@@ -50,6 +50,7 @@ private:
     int max_iter;
     int stop_lying_iter;
     int mom_switch_iter;
+    int n_trees;
     PixelSNE* pixelsne;
     QWaitCondition condition;
     QString inputLoc;

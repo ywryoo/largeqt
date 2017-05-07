@@ -35,7 +35,8 @@ void NeighborThread::run()
 {
     if(pixelsne != NULL)
     {
-        for(int i = 0; i < 3 ; i ++)
+        printf("LargeQT: total propagation: %d\n",pixelsne->get_propagation_num());
+        for(int i = 0; i < pixelsne->get_propagation_num() ; i ++)
         {
             pixelsne->updateKNN(i);
         }
