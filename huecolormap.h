@@ -1,3 +1,6 @@
+/// source code from qwt examples
+/// Modified by Ryangwook Ryoo, 2017
+
 #include <qwt_color_map.h>
 
 class HueColorMap: public QwtColorMap

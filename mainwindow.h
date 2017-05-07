@@ -1,3 +1,11 @@
+/// @author Ryangwook Ryoo, 2017
+/// @email ywryoo@gmail.com
+/// @license GNU LGPL
+///
+/// Distributed under the GNU LGPL License
+/// (See accompanying file LICENSE or copy at
+/// http://www.gnu.org/licenses/lgpl.html)
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 

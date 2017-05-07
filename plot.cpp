@@ -1,3 +1,6 @@
+/// source code from qwt examples
+/// Modified by Ryangwook Ryoo, 2017
+
 #include "plot.h"
 #include <qwt_plot_magnifier.h>
 #include <qwt_plot_panner.h>

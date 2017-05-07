@@ -1,5 +1,8 @@
+/// source code from qwt examples
+/// Modified by Ryangwook Ryoo, 2017
+
 #ifndef _PLOT_H_
-#define _PLOT_H_ 1
+#define _PLOT_H_
 
 #include <qwt_plot.h>
 #include <QColormap>
