@@ -27,7 +27,7 @@ public:
 private:
     QwtPlotCurve *default_curve;
     QwtPlotCurve** d_curves = NULL;
-    int label_num;
+    int label_num = 0;
 };
 
 #endif // _PLOT_H_

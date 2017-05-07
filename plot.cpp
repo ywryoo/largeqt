@@ -92,7 +92,13 @@ void Plot::setSymbol( QwtSymbol *symbol )
 
 void Plot::setSamples( const QVector<QPointF> &samples )
 {
-
+    for(int i = 0; i < label_num; i++)
+    {
+        d_curves[i]->detach();
+        delete d_curves[i];
+    }
+    label_num = 0;
+    
     default_curve->attach( this );
 
     default_curve->setPaintAttribute( 
@@ -103,6 +109,13 @@ void Plot::setSamples( const QVector<QPointF> &samples )
 
 void Plot::setLabels(int max)
 {
+    default_curve->detach();
+
+    for(int i = 0; i < label_num; i++)
+    {
+        d_curves[i]->detach();
+        delete d_curves[i];
+    }
     label_num = max;
     d_curves = new QwtPlotCurve*[label_num];
 	QwtInterval a = QwtInterval(0,label_num);
