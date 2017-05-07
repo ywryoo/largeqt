@@ -22,4 +22,12 @@ brew install gsl qwt qt
 
 
 ## Usage
- - if you made .dat file from pixelsne matlab wrapper, you can use the data without parameter by using .dat extension as input file name
+ - if you made .dat file from pixelsne matlab wrapper, you can use the data without parameter by using .dat extension as input file name. labels is single numbers, data should be formatted like LargeVis.
+
+## Acknowledgement
+ This project uses ANNOY, LargeVis, PixelSNE, QT and QWT with corresponding documents and papers. Links will be added afterwords.
+
+## License
+ There are several licenses for each source code, which is noticed above in each source code. ANNOY and LargeVis takes Apache License 2.0, pixelsne has no License yet(this code is continuation of pixelsne on some part so there are no problem to use it), QT and QWT is LGPL or similar and others are LGPL by Ryangwook Ryoo.
+
+ 
