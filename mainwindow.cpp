@@ -27,8 +27,8 @@ MainWindow::MainWindow()
     QObject::connect(startButton, SIGNAL(clicked()),this, SLOT(startPixelSNE()));
 
     //restart button -> restartPixelSNE
-    QPushButton *restartButton = new QPushButton("&Restart", this);
-    QObject::connect(restartButton, SIGNAL(clicked()),this, SLOT(restartPixelSNE()));
+    //QPushButton *restartButton = new QPushButton("&Restart", this);
+    //QObject::connect(restartButton, SIGNAL(clicked()),this, SLOT(restartPixelSNE()));
 
     //right panel
     QWidget *formGroupBox = new QWidget;
