@@ -12,7 +12,9 @@
 #include <QtWidgets>
 #include <stdlib.h>
 #include <stdio.h>
-
+#include <QApplication>
+#define BILLION 1000000000L
+struct timespec start_time, end_time;
 WorkerThread::WorkerThread(QObject *parent): QThread(parent)
 {
     inputLoc = QString::fromLocal8Bit("data.dat");
@@ -23,6 +25,7 @@ WorkerThread::WorkerThread(QObject *parent): QThread(parent)
     mom_switch_iter=250;
     n_propagations = 3;
     labels=NULL;
+    needExit = false;
 }
 
 WorkerThread::~WorkerThread()
@@ -63,6 +66,30 @@ void WorkerThread::runrun(QString input, QString label, int propagation_num, dou
         condition.wakeOne();
     }*/
 }
+void WorkerThread::runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees)
+{
+    inputLoc = input;
+    labelLoc = label;
+    outLoc = out;
+    n_propagations = propagation_num;
+    theta = th;
+    perplexity = perp;
+    bins = binbin;
+    p_method = pm;
+    rand_seed = rseed;
+    knn_validation = isValidation;
+    n_threads = threads;
+    pipelineEnabled = isPipelined;
+    n_trees = n_rptrees;
+    needExit = true;
+
+   if (!isRunning()) {
+        start(LowPriority);
+    }/* else {
+        restart = true;
+        condition.wakeOne();
+    }*/
+}
 
 void WorkerThread::stopWorkers()
 {
@@ -76,11 +103,16 @@ void WorkerThread::stopWorkers()
 
 void WorkerThread::run()
 {
+    FILE* time_file;
+    double calc_time = 0;
+    double total_time = 0;
+
     pixelsne = new PixelSNE();
     sendLog("Loading Data..");
 
     if(inputLoc.contains(".dat",Qt::CaseInsensitive))
     {
+
         //temp vals for dump value
         int tempint;
         int tempint2;
@@ -91,6 +123,34 @@ void WorkerThread::run()
 
         // Read the parameters and the dataset
         pixelsne->load_data(inputLoc.toUtf8().constData(), &data, &origN, &D, &tempint, &tempdouble, &tempdouble2, &tempuint, &tempint2, &tempint3);
+    }
+    else if(inputLoc.contains(".log",Qt::CaseInsensitive))
+    {
+        FILE *h;
+        size_t res = -1;
+        int n, d;
+        if((h = fopen(inputLoc.toUtf8().constData(), "r+b")) == NULL) {
+            printf("LargeQT: Error: could not open data file.\n");
+            return;
+        }
+        res = fread(&origN, sizeof(int), 1, h);                                            
+        res = fread(&D, sizeof(int), 1, h);                                            
+
+        data = (double*) malloc(D * origN * sizeof(double));
+        if(data == NULL) { printf("LargeQT: Memory allocation failed!\n"); return; }
+        res = fread(data, sizeof(double), origN * D, h);                               
+                        
+        fclose(h);
+        printf("LargeQT: Read the %i x %i data matrix successfully!\n", origN, D);
+
+        if(!labelLoc.isEmpty()){
+            loadLabels(origN);
+        }
+
+        emit updatePoints(data, origN, 2);
+        sendLog("Log loaded");
+
+        return;
     }
     else
     {
@@ -109,19 +169,14 @@ void WorkerThread::run()
         sendLog(QString("Data(%1, %2D) are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));
 
     }
-
-    // Make dummy landmarks
-    int* landmarks = (int*) malloc(N * sizeof(int));
-    if(landmarks == NULL) { printf("LargeQT: Memory allocation failed!\n"); exit(1); }
-    for(int n = 0; n < N; n++) landmarks[n] = n;
-
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
     double* Y = (double*) malloc(N * 2 * sizeof(double));
     double* costs = (double*) calloc(N, sizeof(double));
     if(Y == NULL || costs == NULL) { printf("LargeQT: Memory allocation failed!\n"); exit(1); }
 
+
     //run RP Tree ONLY
     pixelsne->run(data, N, D, Y, 2, perplexity, theta, bins, p_method, rand_seed, n_threads, n_propagations, false, n_trees, knn_validation, max_iter, stop_lying_iter, mom_switch_iter);
-    sendLog("Initialized.");
 
     isInitDone = true;
     //run background threads for neighbor exploring
@@ -134,19 +189,68 @@ void WorkerThread::run()
             nthread->wait(); //Neighbor exploring will be done before visualization
         }
     }
+    clock_gettime(CLOCK_MONOTONIC, &end_time);
+
+    sendLog("Initialized.");
+
+    total_time += (double)(end_time.tv_sec - start_time.tv_sec) + (double)(end_time.tv_nsec - start_time.tv_nsec)/BILLION;
+    printf("LargeQT: Visualization started at %.2lfs\n", total_time);
+    if(!outLoc.isEmpty())
+    {
+        printf("LargeQT: Logging on\n");
+        time_file = fopen(QString(outLoc).append("_time_label.txt").toUtf8().constData(), "w+");
+        calc_time = pixelsne->init_real_time + pixelsne->propagation_real_time;
+        char temp_str[100] = "";
+        sprintf(temp_str, "%.4lf %.4lf\n", calc_time, total_time);
+        fwrite(temp_str, strlen(temp_str), 1, time_file);
+
+    }
+    clock_gettime(CLOCK_MONOTONIC, &start_time);
+    double temptime = 0;
 
     //TODO max_iter should come from pixelsne
     for(int iter = 0; iter < pixelsne->get_max_iter(); iter++) {
+
         //a gradient descent
         pixelsne->updatePoints(Y, N, 2, theta, bins, iter, stop_lying_iter, mom_switch_iter, max_iter);
-        
+
+        clock_gettime(CLOCK_MONOTONIC, &end_time);        
+        temptime += (double)(end_time.tv_sec - start_time.tv_sec) + (double)(end_time.tv_nsec - start_time.tv_nsec)/BILLION;
+        total_time += (double)(end_time.tv_sec - start_time.tv_sec) + (double)(end_time.tv_nsec - start_time.tv_nsec)/BILLION;
         sendLog(QString("Gradient Descent is running - %1/%2").arg(QString::number(iter+1),QString::number(max_iter)));
         
         //visualizing points
         emit updatePoints(Y, N, 2);
+        if (iter > 0 && (iter % 50 == 0 || iter == pixelsne->get_max_iter() - 1)) {
+            clock_gettime(CLOCK_MONOTONIC, &end_time);
+
+            printf("LargeQT: Iteration %d: 50 iterations in %4.2lf real seconds\n", iter, temptime);
+            
+            temptime = 0;
+        
+        }
+        if(!outLoc.isEmpty())
+        {
+            char temp_str[100] = "";
+            sprintf(temp_str, "%.4lf %.4lf\n", calc_time+pixelsne->fitting_real_time, total_time);
+            fwrite(temp_str, strlen(temp_str), 1, time_file);
+            //save logs
+            pixelsne->save_data(QString(outLoc).toUtf8().constData(), Y, N, 2, theta, bins, iter);
+        }
+        clock_gettime(CLOCK_MONOTONIC, &start_time);
     }
+    printf("LargeQT: Visualization ended at %.2lfs\n", total_time);
 
     sendLog("Done.");
+    
+    if(!outLoc.isEmpty())
+    {
+        fclose(time_file);
+        if(needExit)
+        {
+            quit_app();
+        }
+    }
 }
 
 void WorkerThread::loadLabels(int NN)

@@ -1,11 +1,20 @@
-/// @author Ryangwook Ryoo, 2017
-/// @email ywryoo@gmail.com
-/// @license GNU LGPL
-///
-/// Distributed under the GNU LGPL License
-/// (See accompanying file LICENSE or copy at
-/// http://www.gnu.org/licenses/lgpl.html)
+/*
+   Copyright 2016 LargeVis authors
 
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+   Modified by Ryangwook Ryoo
+*/
 #include "mainwindow.h"
 #include "plot.h"
 #include "borderlayout.h"
@@ -16,9 +25,68 @@
 #include "workerthread.h"
 #include <iostream>
 #include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-MainWindow::MainWindow()
+MainWindow::MainWindow(int argc, char **argv)
 {
+    char infile[1000], labelfile[1000], outfile[1000];
+    int prop, pmethod, threads, pipelining, trees, rseed, knnval;
+    unsigned int bins;
+    double theta, perp;
+
+	long long i;
+        
+    strcpy(infile, "data.txt");
+    strcpy(labelfile, "label.txt");
+    strcpy(outfile, "");
+    theta = 0.5;
+    perp = 50;
+    trees = -1;
+    rseed = 30;
+    knnval = 1;
+    prop = 3;
+    pmethod = 0;
+    threads = 4;
+    pipelining = 1;
+    bins = 512;
+
+    if(argc < 3)
+    {
+        printf("GUI Mode is used if no args are provided. You can instantly run  largeqt by using these options\n");
+        printf("-input: Input file of feature vectors\n");
+        printf("-labels: Label file for input file\n");
+        printf("-output: If specified, full logs will be written\n");
+        printf("-theta: Used in PixelSNE. Default is 0.5\n");
+        printf("-perp: The perplexity used for deciding edge weights in K-NNG. Default is 50.\n");
+        printf("-trees: Number of random-projection trees used for constructing K-NNG. 50 is sufficient for most cases.\n");
+        printf("-rseed: Seed value for random\n");
+        printf("-knnval: 1 for on, 0 for off. reduce propagation time. Default is 1\n");
+        printf("-prop: Number of times for neighbor propagations in the state of K-NNG construction. Default is 3.\n");
+        printf("-pmethod: 0 for rptrees, 1 for vptree without multithreading. Default is 0.\n");
+        printf("-threads: Number of threads. Default is 4.\n");
+        printf("-pipelining: 1 for on, 0 for off. pipelining propagation. default is 1\n");
+        printf("-bins: PixelSNE option. Default is 512\n");
+    }
+    else
+    {
+
+        if ((i = ArgPos((char *)"-input", argc, argv)) > 0) strcpy(infile, argv[i + 1]);
+        if ((i = ArgPos((char *)"-labels", argc, argv)) > 0) strcpy(labelfile, argv[i + 1]);
+        if ((i = ArgPos((char *)"-output", argc, argv)) > 0) strcpy(outfile, argv[i + 1]);
+        if ((i = ArgPos((char *)"-theta", argc, argv)) > 0) theta = atof(argv[i + 1]);
+        if ((i = ArgPos((char *)"-perp", argc, argv)) > 0) perp = atof(argv[i + 1]);
+        if ((i = ArgPos((char *)"-trees", argc, argv)) > 0) trees = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-rseed", argc, argv)) > 0) rseed = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-knnval", argc, argv)) > 0) knnval = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-prop", argc, argv)) > 0) prop = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-pmethod", argc, argv)) > 0) pmethod = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-threads", argc, argv)) > 0) threads = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-pipelining", argc, argv)) > 0) pipelining = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-bins", argc, argv)) > 0) bins = atoi(argv[i + 1]);
+
+    }
     //scatterplot
     d_plot = new Plot( this );
 
@@ -27,8 +95,8 @@ MainWindow::MainWindow()
     QObject::connect(startButton, SIGNAL(clicked()),this, SLOT(startPixelSNE()));
 
     //restart button -> restartPixelSNE
-    //QPushButton *restartButton = new QPushButton("&Restart", this);
-    //QObject::connect(restartButton, SIGNAL(clicked()),this, SLOT(restartPixelSNE()));
+    QPushButton *restartButton = new QPushButton("&Restart", this);
+    QObject::connect(restartButton, SIGNAL(clicked()),this, SLOT(restartPixelSNE()));
 
     //right panel
     QWidget *formGroupBox = new QWidget;
@@ -36,55 +104,55 @@ MainWindow::MainWindow()
 
     //input
     QinputLocation = new QLineEdit("");
-    QinputLocation->setText("data.txt");
+    QinputLocation->setText(infile);
 
     //label
     QlabelLocation = new QLineEdit("");
-    QlabelLocation->setText("label.txt");
+    QlabelLocation->setText(labelfile);
 
     //theta
     Qtheta = new QDoubleSpinBox();
-    Qtheta->setValue(0.5);
+    Qtheta->setValue(theta);
 
     //perplexity
     Qperplexity = new QSpinBox();
-    Qperplexity->setValue(50);
+    Qperplexity->setValue(perp);
 
     //RP Tree numbers
     Qn_rptrees = new QSpinBox();
     Qn_rptrees->setMinimum(-1);
-    Qn_rptrees->setValue(-1);
+    Qn_rptrees->setValue(trees);
 
     //rand_seed
     Qrand_seed = new QSpinBox();
     Qrand_seed->setMinimum(-1);
-    Qrand_seed->setValue(30);
+    Qrand_seed->setValue(rseed);
 
     //rand_init
     Qknn_validation = new QCheckBox();
-    Qknn_validation->setChecked(true);
+    Qknn_validation->setChecked(knnval == 1 ? true : false);
 
     //n_propagations
     Qn_propagations = new QSpinBox();
-    Qn_propagations->setValue(3);
+    Qn_propagations->setValue(prop);
 
     //p_method
     Qp_method = new QSpinBox();
-    Qp_method->setValue(0);
+    Qp_method->setValue(pmethod);
 
     //n_threads
     Qn_threads = new QSpinBox();
-    Qn_threads->setValue(4);
+    Qn_threads->setValue(threads);
 
     //pipelining
     QPipelining = new QCheckBox();
-    QPipelining->setChecked(true);
+    QPipelining->setChecked(pipelining == 1 ? true : false);
 
     //bins
     Qbins = new QSpinBox();
-    Qbins->setMaximum(10000);
+    Qbins->setMaximum(4096);
     Qbins->setMinimum(50);
-    Qbins->setValue(512);
+    Qbins->setValue(bins);
 
     //add boxes to panel
     layout->addRow(new QLabel(tr("Input Location")), QinputLocation);
@@ -118,6 +186,18 @@ MainWindow::MainWindow()
 
     //title
     setWindowTitle(tr("Largeqt"));
+
+    if(argc >= 3)
+    {
+
+        thread = new WorkerThread;
+        connect(thread, SIGNAL(quit_app()), this, SLOT(on_quit()));
+        connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
+        connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
+        connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
+        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees);
+
+    }
 }
 
 MainWindow::~MainWindow()
@@ -181,6 +261,7 @@ void MainWindow::startPixelSNE()
         msgBox.exec();
     } else {
         thread = new WorkerThread;
+        connect(thread, SIGNAL(quit_app()), this, SLOT(on_quit()));
         connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
@@ -208,8 +289,34 @@ void MainWindow::restartPixelSNE()
         }
     }
     thread = new WorkerThread;
+    connect(thread, SIGNAL(quit_app()), this, SLOT(on_quit()));
     connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
     connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
     connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
     thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value());
+}
+
+int MainWindow::ArgPos(char *str, int argc, char **argv) {
+	int a;
+	for (a = 1; a < argc; a++) if (!strcmp(str, argv[a])) {
+		if (a == argc - 1) {
+			printf("Argument missing for %s\n", str);
+			exit(1);
+		}
+		return a;
+	}
+	return -1;
+}
+
+void MainWindow::on_quit()
+{
+    if(thread != NULL && thread->isRunning())
+    {
+        thread->stopWorkers();
+        thread->terminate();
+        thread->wait();
+        thread = NULL;
+    }
+    close();
+    QCoreApplication::quit();
 }

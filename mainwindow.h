@@ -24,7 +24,7 @@ class MainWindow: public QWidget
     Q_OBJECT
 
 public:
-    MainWindow();
+    MainWindow(int argc, char **argv);
     ~MainWindow();
 
 private slots:
@@ -33,6 +33,7 @@ private slots:
     void startPixelSNE();
     void restartPixelSNE();
     void setConsoleText(const QString text);
+    void on_quit();
 private:
     QPushButton *startButton;
     QLabel *createLabel(const QString &text);
@@ -52,5 +53,6 @@ private:
     WorkerThread *thread = NULL;
     Plot *d_plot;
     int *data_labels = NULL;
+    int ArgPos(char *str, int argc, char **argv);
 };
 #endif

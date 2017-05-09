@@ -22,6 +22,7 @@ public:
     WorkerThread(QObject *parent = 0);
     ~WorkerThread();
     void runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees);
+    void runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees);
     void stopWorkers();
     bool initDone();
 protected:
@@ -31,12 +32,14 @@ signals:
     void updateLabels(int* labels, int N);
     void updatePoints(double* Y, int N, int no_dims);
     void sendLog(QString text);
+    void quit_app();
 private:
     int     origN;
     int     N;
     int     D;
     int     n_threads;
     int     n_propagations;
+    bool needExit;
     bool pipelineEnabled;
     bool isInitDone;
     bool knn_validation;
@@ -55,6 +58,7 @@ private:
     QWaitCondition condition;
     QString inputLoc;
     QString labelLoc;
+    QString outLoc;
     NeighborThread* nthread;
     void loadLabels(int NN);
 };
