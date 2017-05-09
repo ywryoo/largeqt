@@ -1,6 +1,17 @@
 # largeqt
 
 ## Installation
+Building code in Ubuntu is recommended. This project use clock_gettime() for benchmarking, which is not supported in OS X. Also, windows does not support now. pthread is used for multi threading, which can only be used in *nix systems. It is possible to build in windows if some code is changed. However, that is not in a schedule.
+
+### Linux(Ubuntu)
+1. install qt5, gsl from apt
+```bash
+sudo apt-get install qtbase5-dev libgsl-dev libgsl0-dev libgsl0ldbl
+```
+2. [build and install qwt](http://qwt.sourceforge.net/qwtinstall.html)
+3. set QWT_PATH in largeqt.pro if path is changed.
+4. `qmake largeqt.pro`
+5. `cd ./bin && ./scatterplot`
 
 ### Mac
 
@@ -14,15 +25,8 @@ brew install gsl qwt qt
 5. `qmake largeqt.pro`
 6. `cd ./bin/scatterplot.app/Conetents/MacOS && ./scatterplot`
 
-### Linux(Ubuntu)
-1. install qt5, gsl and qwt
-3. set QWT_PATH in largeqt.pro if path is changed.
-5. `qmake largeqt.pro`
-6. `cd ./bin && ./scatterplot`
-
-
 ## Usage
- - if you made .dat file from pixelsne matlab wrapper, you can use the data without parameter by using .dat extension as input file name. labels is single numbers, data should be formatted like LargeVis.
+ - if you made .dat file from pixelsne matlab wrapper, you can use the data without parameter by using .dat extension as input file name. labels are single numbers, data should be formatted like LargeVis.
 
 ## Acknowledgement
  This project uses ANNOY, LargeVis, PixelSNE, QT and QWT with corresponding documents and papers. Links will be added afterwords.
