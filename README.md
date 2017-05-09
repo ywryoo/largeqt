@@ -22,8 +22,9 @@ brew install gsl qwt qt
 ```
 3. set QWT_PATH in largeqt.pro if path is changed.
 4. link libraries(see [this link](http://stackoverflow.com/questions/18588418/install-and-use-qwt-under-mac-os-x) if you encounter a problem)
-5. `qmake largeqt.pro`
-6. `cd ./bin/scatterplot.app/Conetents/MacOS && ./scatterplot`
+5. change lseek64 to lseek in annoylib.h([link](https://github.com/lferry007/LargeVis)). 
+6. `qmake largeqt.pro`
+7. `cd ./bin/scatterplot.app/Conetents/MacOS && ./scatterplot`
 
 ## Usage
  - if you made .dat file from pixelsne matlab wrapper, you can use the data without parameter by using .dat extension as input file name. labels are single numbers, data should be formatted like LargeVis.
