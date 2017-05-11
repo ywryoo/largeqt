@@ -1,7 +1,7 @@
 # largeqt
 
 ## Installation
-Building code in Ubuntu is recommended. This project use clock_gettime() for benchmarking, which is not supported in OS X. Also, windows does not support now. pthread is used for multi threading, which can only be used in *nix systems. It is possible to build in windows if some code is changed. However, that is not in a schedule.
+Building code in Ubuntu is recommended. ~~This project use clock_gettime() for benchmarking, which is not supported in OS X.~~ *Note. Not verified* Also, windows does not support now. pthread is used for multi threading, which can only be used in \*nix systems. It is possible to build in windows if some code is changed. However, that is not in a schedule.
 
 ### Linux(Ubuntu)
 1. install qt5, gsl from apt
