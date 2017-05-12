@@ -54,6 +54,7 @@ private:
     Plot *d_plot;
     int *data_labels = NULL;
     int sleep;
+    int fitting_threading;
     int ArgPos(char *str, int argc, char **argv);
 };
 #endif

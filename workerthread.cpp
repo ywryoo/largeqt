@@ -27,6 +27,7 @@ WorkerThread::WorkerThread(QObject *parent): QThread(parent)
     labels=NULL;
     needExit = false;
     sleeping = false;
+    fitting_threading = false;
 }
 
 WorkerThread::~WorkerThread()
@@ -45,7 +46,7 @@ WorkerThread::~WorkerThread()
 }
 
 
-void WorkerThread::runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees, bool sleep)
+void WorkerThread::runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees, bool sleep, bool threading)
 {
     inputLoc = input;
     labelLoc = label;
@@ -60,6 +61,7 @@ void WorkerThread::runrun(QString input, QString label, int propagation_num, dou
     pipelineEnabled = isPipelined;
     n_trees = n_rptrees;
     sleeping = sleep;
+    fitting_threading = threading;
 
    if (!isRunning()) {
         start(LowPriority);
@@ -68,7 +70,7 @@ void WorkerThread::runrun(QString input, QString label, int propagation_num, dou
         condition.wakeOne();
     }*/
 }
-void WorkerThread::runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees,bool sleep)
+void WorkerThread::runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees,bool sleep, bool threading)
 {
     inputLoc = input;
     labelLoc = label;
@@ -84,6 +86,7 @@ void WorkerThread::runrun(QString input, QString label, QString out, int propaga
     pipelineEnabled = isPipelined;
     n_trees = n_rptrees;
     sleeping = sleep;
+    fitting_threading = threading;
 
     needExit = true;
 
@@ -216,7 +219,7 @@ void WorkerThread::run()
     for(int iter = 0; iter < pixelsne->get_max_iter(); iter++) {
 
         //a gradient descent
-        pixelsne->updatePoints(Y, N, 2, theta, bins, sleeping, iter, stop_lying_iter, mom_switch_iter, max_iter);
+        pixelsne->updatePoints(Y, N, 2, theta, bins, fitting_threading, sleeping, iter, stop_lying_iter, mom_switch_iter, max_iter);
 
         clock_gettime(CLOCK_MONOTONIC, &end_time);        
         temptime += (double)(end_time.tv_sec - start_time.tv_sec) + (double)(end_time.tv_nsec - start_time.tv_nsec)/BILLION;

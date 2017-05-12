@@ -21,8 +21,8 @@ class WorkerThread : public QThread
 public:
     WorkerThread(QObject *parent = 0);
     ~WorkerThread();
-    void runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees, bool sleep);
-    void runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees, bool sleep);
+    void runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees, bool sleep, bool threading);
+    void runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees, bool sleep, bool threading);
     void stopWorkers();
     bool initDone();
 protected:
@@ -44,6 +44,7 @@ private:
     bool isInitDone;
     bool knn_validation;
     bool sleeping;
+    bool fitting_threading;
     double  perplexity;
     double  theta;
     double* data;
