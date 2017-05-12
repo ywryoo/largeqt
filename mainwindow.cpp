@@ -56,7 +56,7 @@ MainWindow::MainWindow(int argc, char **argv)
     {
         printf("GUI Mode is used if no args are provided. You can instantly run  largeqt by using these options\n");
         printf("-input: Input file of feature vectors\n");
-        printf("-labels: Label file for input file\n");
+        printf("-label: Label file for input file\n");
         printf("-output: If specified, full logs will be written\n");
         printf("-theta: Used in PixelSNE. Default is 0.5\n");
         printf("-perp: The perplexity used for deciding edge weights in K-NNG. Default is 50.\n");
@@ -73,7 +73,7 @@ MainWindow::MainWindow(int argc, char **argv)
     {
 
         if ((i = ArgPos((char *)"-input", argc, argv)) > 0) strcpy(infile, argv[i + 1]);
-        if ((i = ArgPos((char *)"-labels", argc, argv)) > 0) strcpy(labelfile, argv[i + 1]);
+        if ((i = ArgPos((char *)"-label", argc, argv)) > 0) strcpy(labelfile, argv[i + 1]);
         if ((i = ArgPos((char *)"-output", argc, argv)) > 0) strcpy(outfile, argv[i + 1]);
         if ((i = ArgPos((char *)"-theta", argc, argv)) > 0) theta = atof(argv[i + 1]);
         if ((i = ArgPos((char *)"-perp", argc, argv)) > 0) perp = atof(argv[i + 1]);
