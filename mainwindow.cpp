@@ -51,8 +51,8 @@ MainWindow::MainWindow(int argc, char **argv)
     threads = 4;
     pipelining = 1;
     bins = 512;
-    sleep = 0;
-    fitting_threading = 0;
+    sleep = 1;
+    fitting_threading = 1;
     
     if(argc < 3)
     {
@@ -65,8 +65,8 @@ MainWindow::MainWindow(int argc, char **argv)
         printf("-trees: Number of random-projection trees used for constructing K-NNG. 50 is sufficient for most cases.\n");
         printf("-rseed: Seed value for random\n");
         printf("-knnval: 1 for on, 0 for off. Reduce propagation time. Default is 1\n");
-        printf("-sleep: 1 for on, 0 for off. Reduce fitting time by sleeping points. Default is 0\n");
-        printf("-fthread: 1 for on, 0 for off. threading Gradient Descent. Default is 0\n");
+        printf("-sleep: 1 for on, 0 for off. Reduce fitting time by sleeping points. Default is 1\n");
+        printf("-fthread: 1 for on, 0 for off. threading Gradient Descent. Default is 1\n");
         printf("-prop: Number of times for neighbor propagations in the state of K-NNG construction. Default is 3.\n");
         printf("-pmethod: 0 for rptrees, 1 for vptree without multithreading. Default is 0.\n");
         printf("-threads: Number of threads. Default is 4.\n");
@@ -101,8 +101,8 @@ MainWindow::MainWindow(int argc, char **argv)
     QObject::connect(startButton, SIGNAL(clicked()),this, SLOT(startPixelSNE()));
 
     //restart button -> restartPixelSNE
-    QPushButton *restartButton = new QPushButton("&Restart", this);
-    QObject::connect(restartButton, SIGNAL(clicked()),this, SLOT(restartPixelSNE()));
+//    QPushButton *restartButton = new QPushButton("&Restart", this);
+ //   QObject::connect(restartButton, SIGNAL(clicked()),this, SLOT(restartPixelSNE()));
 
     //right panel
     QWidget *formGroupBox = new QWidget;
@@ -134,9 +134,17 @@ MainWindow::MainWindow(int argc, char **argv)
     Qrand_seed->setMinimum(-1);
     Qrand_seed->setValue(rseed);
 
-    //rand_init
+    //knn_validation
     Qknn_validation = new QCheckBox();
     Qknn_validation->setChecked(knnval == 1 ? true : false);
+
+    //sleeping
+    Qsleeping = new QCheckBox();
+    Qsleeping->setChecked(sleep == 1 ? true : false);
+
+    //gradient_threading
+    Qgradient_threading = new QCheckBox();
+    Qgradient_threading->setChecked(fitting_threading == 1 ? true : false);
 
     //n_propagations
     Qn_propagations = new QSpinBox();
@@ -168,13 +176,15 @@ MainWindow::MainWindow(int argc, char **argv)
     layout->addRow(new QLabel(tr("n_rptrees")), Qn_rptrees);
     layout->addRow(new QLabel(tr("rand_seed")), Qrand_seed);
     layout->addRow(new QLabel(tr("knn_validation")), Qknn_validation);
+    layout->addRow(new QLabel(tr("sleeping")), Qsleeping);
+    layout->addRow(new QLabel(tr("gradient_threading")), Qgradient_threading);
     layout->addRow(new QLabel(tr("n_propagations")), Qn_propagations);
     layout->addRow(new QLabel(tr("p_method")), Qp_method);
     layout->addRow(new QLabel(tr("n_threads")), Qn_threads);
     layout->addRow(new QLabel(tr("pipelining")), QPipelining);    
     layout->addRow(new QLabel(tr("bins")), Qbins);
     layout->addRow(startButton);
-    layout->addRow(restartButton);
+//    layout->addRow(restartButton);
     formGroupBox->setLayout(layout);
 
     //console label
@@ -308,7 +318,7 @@ void MainWindow::startPixelSNE()
         connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),sleep == 1 ? true : false, fitting_threading == 1 ? true : false);
+        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),Qsleeping->isChecked(), Qgradient_threading->isChecked());
     }
 }
 
@@ -336,7 +346,7 @@ void MainWindow::restartPixelSNE()
     connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
     connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
     connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),sleep == 1 ? true : false, fitting_threading == 1 ? true : false);
+    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),Qsleeping->isChecked(), Qgradient_threading->isChecked());
 }
 
 int MainWindow::ArgPos(char *str, int argc, char **argv) {

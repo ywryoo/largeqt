@@ -183,7 +183,7 @@ void WorkerThread::run()
 
 
     //run RP Tree ONLY
-    pixelsne->run(data, N, D, Y, 2, perplexity, theta, bins, p_method, rand_seed, n_threads, n_propagations, false, n_trees, knn_validation, max_iter, stop_lying_iter, mom_switch_iter);
+    pixelsne->run(data, N, D, Y, 2, perplexity, theta, bins, p_method, rand_seed, n_threads, n_propagations, false, n_trees, knn_validation, pipelineEnabled, max_iter, stop_lying_iter, mom_switch_iter);
 
     isInitDone = true;
     //run background threads for neighbor exploring

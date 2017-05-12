@@ -49,6 +49,9 @@ private:
     QSpinBox* Qn_threads;
     QCheckBox* QPipelining;
     QCheckBox* Qknn_validation;
+    QCheckBox* Qsleeping;
+    QCheckBox* Qgradient_threading;
+
     QSpinBox* Qbins;
     WorkerThread *thread = NULL;
     Plot *d_plot;
