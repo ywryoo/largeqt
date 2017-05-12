@@ -8,10 +8,14 @@ Building code in Ubuntu is recommended. ~~This project use clock_gettime() for b
 ```bash
 sudo apt-get install qtbase5-dev libgsl-dev libgsl0-dev libgsl0ldbl
 ```
-2. [build and install qwt](http://qwt.sourceforge.net/qwtinstall.html)
+2. [build and install qwt](http://qwt.sourceforge.net/qwtinstall.html). Don't forget to set QMAKEFEATURES.
 3. set QWT_PATH in largeqt.pro if path is changed.
-4. `qmake largeqt.pro`
-5. `cd ./bin && ./scatterplot`
+4. set LD_LIBRARY_PATH for qwt at ~/.bashrc
+```bash
+LD_LIBRARY_PATH="/usr/local/qwt-6.1.3:$LD_LIBRARY_PATH"
+```
+5. `qmake largeqt.pro`
+6. `cd ./bin && ./scatterplot`
 
 ### Mac
 
@@ -21,6 +25,7 @@ sudo apt-get install qtbase5-dev libgsl-dev libgsl0-dev libgsl0ldbl
 brew install gsl qwt qt
 ```
 3. set QWT_PATH in largeqt.pro if path is changed.
+4. [set QMAKEFEATURES](http://qwt.sourceforge.net/qwtinstall.html).
 4. link libraries(see [this link](http://stackoverflow.com/questions/18588418/install-and-use-qwt-under-mac-os-x) if you encounter a problem)
 5. change lseek64 to lseek in annoylib.h([link](https://github.com/lferry007/LargeVis)). 
 6. `qmake largeqt.pro`
