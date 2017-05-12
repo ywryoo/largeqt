@@ -33,6 +33,11 @@ brew install gsl qwt qt
 
 ## Usage
  - if you made .dat file from pixelsne matlab wrapper, you can use the data without parameter by using .dat extension as input file name. labels are single numbers, data should be formatted like LargeVis.
+### Logs
+If output option is provided(only cli available), Logs are generated.
+ - \*_iter_n.log: N, D, Y, C(error) is written by binary. you can use this log as input to see the result.
+ - \*_variables.txt: given variables
+ - \*_time_label.txt: timestamps for iterations. first line is init time of vis, next line is iter 1, and so on.
 
 ## Acknowledgement
  This project uses ANNOY, LargeVis, PixelSNE, QT and QWT with corresponding documents and papers. Links will be added afterwords.
