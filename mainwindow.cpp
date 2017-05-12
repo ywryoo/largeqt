@@ -37,7 +37,7 @@ MainWindow::MainWindow(int argc, char **argv)
     double theta, perp;
 
 	long long i;
-        
+
     strcpy(infile, "data.txt");
     strcpy(labelfile, "label.txt");
     strcpy(outfile, "");
@@ -51,6 +51,7 @@ MainWindow::MainWindow(int argc, char **argv)
     threads = 4;
     pipelining = 1;
     bins = 512;
+    sleep = 0;
 
     if(argc < 3)
     {
@@ -63,6 +64,7 @@ MainWindow::MainWindow(int argc, char **argv)
         printf("-trees: Number of random-projection trees used for constructing K-NNG. 50 is sufficient for most cases.\n");
         printf("-rseed: Seed value for random\n");
         printf("-knnval: 1 for on, 0 for off. reduce propagation time. Default is 1\n");
+        printf("-sleep: 1 for on, 0 for off. reduce fitting time by sleeping points. Default is 0\n");
         printf("-prop: Number of times for neighbor propagations in the state of K-NNG construction. Default is 3.\n");
         printf("-pmethod: 0 for rptrees, 1 for vptree without multithreading. Default is 0.\n");
         printf("-threads: Number of threads. Default is 4.\n");
@@ -80,6 +82,7 @@ MainWindow::MainWindow(int argc, char **argv)
         if ((i = ArgPos((char *)"-trees", argc, argv)) > 0) trees = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-rseed", argc, argv)) > 0) rseed = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-knnval", argc, argv)) > 0) knnval = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-sleep", argc, argv)) > 0) sleep = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-prop", argc, argv)) > 0) prop = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-pmethod", argc, argv)) > 0) pmethod = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-threads", argc, argv)) > 0) threads = atoi(argv[i + 1]);
@@ -195,8 +198,43 @@ MainWindow::MainWindow(int argc, char **argv)
         connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees);
+        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleep == 1 ? true : false);
+        if(!QString(outfile).isEmpty())
+        {
 
+            FILE* fp_saved = fopen(QString(outfile).append("_variables.txt").toUtf8().constData(), "w+");
+            char temp_str[1000] = "";                    
+            sprintf(temp_str, "Input file: %s\n", infile);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Output file: %s\n", outfile);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Label file: %s\n", labelfile);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Theta: %lf\n", theta);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Perplexity: %lf\n", perp);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Number of RPTrees: %d\n", trees);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Random Seed: %d\n", rseed);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "KNN Validation(1 is on): %d\n", knnval);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Sleeping(1 is on): %d\n", sleep);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Number of Propagation: %d\n", prop);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "P method(0 is RPTrees, 1 is VP Tree): %d\n", pmethod);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Number of Threads: %d\n", threads);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Pipelining(1 is on): %d\n", pipelining);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "Bins: %d\n", bins);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+
+            fclose(fp_saved);
+        }
     }
 }
 
@@ -265,7 +303,7 @@ void MainWindow::startPixelSNE()
         connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value());
+        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),sleep == 1 ? true : false);
     }
 }
 
@@ -293,7 +331,7 @@ void MainWindow::restartPixelSNE()
     connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
     connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
     connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value());
+    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),sleep == 1 ? true : false);
 }
 
 int MainWindow::ArgPos(char *str, int argc, char **argv) {

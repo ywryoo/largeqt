@@ -53,6 +53,7 @@ private:
     WorkerThread *thread = NULL;
     Plot *d_plot;
     int *data_labels = NULL;
+    int sleep;
     int ArgPos(char *str, int argc, char **argv);
 };
 #endif
