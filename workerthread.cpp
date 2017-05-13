@@ -210,6 +210,7 @@ void WorkerThread::run()
         char temp_str[100] = "";
         sprintf(temp_str, "%.4lf %.4lf\n", calc_time, total_time);
         fwrite(temp_str, strlen(temp_str), 1, time_file);
+        fclose(time_file);
 
     }
     clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -238,9 +239,11 @@ void WorkerThread::run()
         }
         if(!outLoc.isEmpty())
         {
+            time_file = fopen(QString(outLoc).append("_time_label.txt").toUtf8().constData(), "a+");
             char temp_str[100] = "";
             sprintf(temp_str, "%.4lf %.4lf\n", calc_time+pixelsne->fitting_real_time, total_time);
             fwrite(temp_str, strlen(temp_str), 1, time_file);
+            fclose(time_file);
             //save logs
             pixelsne->save_data(QString(outLoc).toUtf8().constData(), Y, N, 2, theta, bins, iter);
         }
@@ -252,7 +255,6 @@ void WorkerThread::run()
     
     if(!outLoc.isEmpty())
     {
-        fclose(time_file);
         if(needExit)
         {
             quit_app();
