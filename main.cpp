@@ -108,7 +108,8 @@ int main( int argc, char **argv )
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             sprintf(temp_str, "Bins: %d\n", bins);
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
-
+            sprintf(temp_str, "isCli: %d\n", isCliOnly);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             fclose(fp_saved);
         }
         thread->wait();
