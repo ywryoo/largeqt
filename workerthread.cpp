@@ -149,9 +149,12 @@ void WorkerThread::run()
         data = (double*) malloc(D * origN * sizeof(double));
         if(data == NULL) { printf("LargeQT: Memory allocation failed!\n"); return; }
         res = fread(data, sizeof(double), origN * D, h);                               
-                        
+        double C = 0;
+        res = fread(&C, sizeof(double), 1, h);                                                       
+
         fclose(h);
         printf("LargeQT: Read the %i x %i data matrix successfully!\n", origN, D);
+        printf("LargeQT: Error was %lf\n", C);
 
         if(!labelLoc.isEmpty()){
             loadLabels(origN);
@@ -249,8 +252,9 @@ void WorkerThread::run()
                 sprintf(temp_str, "%.4lf %.4lf\n", calc_time+pixelsne->fitting_real_time, total_time);
                 fwrite(temp_str, strlen(temp_str), 1, time_file);
                 fclose(time_file);
+                pixelsne->copy_y(Y, N, 2, iter+1);
                 //save logs
-                pixelsne->save_data(QString(outLoc).toUtf8().constData(), Y, N, 2, theta, bins, iter);
+//                pixelsne->save_data(QString(outLoc).toUtf8().constData(), Y, N, 2, theta, bins, iter);
             }
             
             temptime = 0;
@@ -265,6 +269,8 @@ void WorkerThread::run()
     
     if(!outLoc.isEmpty())
     {
+        pixelsne->save_y(QString(outLoc).toUtf8().constData(), N, 2, theta, bins);
+
         if(needExit && !isCliOnly)
         {
             quit_app();
