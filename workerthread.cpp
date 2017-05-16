@@ -37,8 +37,8 @@ WorkerThread::~WorkerThread()
     if(data != NULL) free(data); data = NULL;
     if(nthread != NULL && nthread->isRunning())
     {
-        nthread->terminate();
-        nthread->wait();
+        nthread->quit();
+        //nthread->wait();
         nthread=NULL;
     }
     if(labels != NULL) free(labels); labels=NULL;
@@ -102,8 +102,8 @@ void WorkerThread::stopWorkers()
 {
     if(nthread != NULL && nthread->isRunning())
     {
-        nthread->terminate();
-        nthread->wait();
+        nthread->quit();
+        //nthread->wait();
         nthread=NULL;
     }
 }
@@ -197,7 +197,6 @@ void WorkerThread::run()
         }
     }
     clock_gettime(CLOCK_MONOTONIC, &end_time);
-
     sendLog("Initialized.");
 
     total_time += (double)(end_time.tv_sec - start_time.tv_sec) + (double)(end_time.tv_nsec - start_time.tv_nsec)/BILLION;
@@ -233,19 +232,19 @@ void WorkerThread::run()
             clock_gettime(CLOCK_MONOTONIC, &end_time);
 
             printf("LargeQT: Iteration %d: 50 iterations in %4.2lf real seconds\n", iter, temptime);
+            if(!outLoc.isEmpty())
+            {
+                time_file = fopen(QString(outLoc).append("_time_label.txt").toUtf8().constData(), "a+");
+                char temp_str[100] = "";
+                sprintf(temp_str, "%.4lf %.4lf\n", calc_time+pixelsne->fitting_real_time, total_time);
+                fwrite(temp_str, strlen(temp_str), 1, time_file);
+                fclose(time_file);
+                //save logs
+                pixelsne->save_data(QString(outLoc).toUtf8().constData(), Y, N, 2, theta, bins, iter);
+            }
             
             temptime = 0;
         
-        }
-        if(!outLoc.isEmpty())
-        {
-            time_file = fopen(QString(outLoc).append("_time_label.txt").toUtf8().constData(), "a+");
-            char temp_str[100] = "";
-            sprintf(temp_str, "%.4lf %.4lf\n", calc_time+pixelsne->fitting_real_time, total_time);
-            fwrite(temp_str, strlen(temp_str), 1, time_file);
-            fclose(time_file);
-            //save logs
-            pixelsne->save_data(QString(outLoc).toUtf8().constData(), Y, N, 2, theta, bins, iter);
         }
         clock_gettime(CLOCK_MONOTONIC, &start_time);
     }

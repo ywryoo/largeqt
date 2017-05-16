@@ -255,8 +255,8 @@ MainWindow::MainWindow(int argc, char **argv)
 
 MainWindow::~MainWindow()
 {
-    if(d_plot != NULL) free(d_plot); d_plot=NULL;
-    if(thread != NULL && thread->isRunning()) thread->terminate(); thread->wait();
+    if(d_plot != NULL) delete d_plot; d_plot=NULL;
+    if(thread != NULL && thread->isRunning()) thread->quit(); //thread->wait();
 }
 
 QLabel *MainWindow::createLabel(const QString &text)
@@ -328,8 +328,8 @@ void MainWindow::restartPixelSNE()
         if(thread->initDone())
         {
             thread->stopWorkers();
-            thread->terminate();
-            thread->wait();
+            thread->quit();
+            //thread->wait();
             thread = NULL;
         }
         else
@@ -366,10 +366,10 @@ void MainWindow::on_quit()
     if(thread != NULL && thread->isRunning())
     {
         thread->stopWorkers();
-        thread->terminate();
-        thread->wait();
+        thread->quit();
+        //thread->wait();
         thread = NULL;
     }
     close();
-    QCoreApplication::quit();
+    //QCoreApplication::quit();
 }
