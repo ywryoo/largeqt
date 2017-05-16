@@ -28,6 +28,7 @@ WorkerThread::WorkerThread(QObject *parent): QThread(parent)
     needExit = false;
     sleeping = false;
     fitting_threading = false;
+    isCliOnly = false;
 }
 
 WorkerThread::~WorkerThread()
@@ -70,7 +71,7 @@ void WorkerThread::runrun(QString input, QString label, int propagation_num, dou
         condition.wakeOne();
     }*/
 }
-void WorkerThread::runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees,bool sleep, bool threading)
+void WorkerThread::runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees,bool sleep, bool threading, bool cliOnly)
 {
     inputLoc = input;
     labelLoc = label;
@@ -87,6 +88,7 @@ void WorkerThread::runrun(QString input, QString label, QString out, int propaga
     n_trees = n_rptrees;
     sleeping = sleep;
     fitting_threading = threading;
+    isCliOnly = cliOnly;
 
     needExit = true;
 
@@ -115,7 +117,8 @@ void WorkerThread::run()
     double total_time = 0;
 
     pixelsne = new PixelSNE();
-    sendLog("Loading Data..");
+    if(!isCliOnly)
+        sendLog("Loading Data..");
 
     if(inputLoc.contains(".dat",Qt::CaseInsensitive))
     {
@@ -154,8 +157,10 @@ void WorkerThread::run()
             loadLabels(origN);
         }
 
-        emit updatePoints(data, origN, 2);
-        sendLog("Log loaded");
+        if(!isCliOnly)
+            emit updatePoints(data, origN, 2);
+        if(!isCliOnly)
+            sendLog("Log loaded");
 
         return;
     }
@@ -169,11 +174,13 @@ void WorkerThread::run()
     N = origN;
     if(!labelLoc.isEmpty()){
         loadLabels(N);
-        sendLog(QString("Data(%1, %2D) with labels are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));       
+        if(!isCliOnly)
+            sendLog(QString("Data(%1, %2D) with labels are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));       
     }
     else
     {
-        sendLog(QString("Data(%1, %2D) are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));
+        if(!isCliOnly)
+            sendLog(QString("Data(%1, %2D) are Loaded! Initializing..").arg(QString::number(origN),QString::number(D)));
 
     }
     clock_gettime(CLOCK_MONOTONIC, &start_time);
@@ -197,7 +204,8 @@ void WorkerThread::run()
         }
     }
     clock_gettime(CLOCK_MONOTONIC, &end_time);
-    sendLog("Initialized.");
+    if(!isCliOnly)
+        sendLog("Initialized.");
 
     total_time += (double)(end_time.tv_sec - start_time.tv_sec) + (double)(end_time.tv_nsec - start_time.tv_nsec)/BILLION;
     printf("LargeQT: Visualization started at %.2lfs\n", total_time);
@@ -224,14 +232,16 @@ void WorkerThread::run()
         clock_gettime(CLOCK_MONOTONIC, &end_time);        
         temptime += (double)(end_time.tv_sec - start_time.tv_sec) + (double)(end_time.tv_nsec - start_time.tv_nsec)/BILLION;
         total_time += (double)(end_time.tv_sec - start_time.tv_sec) + (double)(end_time.tv_nsec - start_time.tv_nsec)/BILLION;
-        sendLog(QString("Gradient Descent is running - %1/%2").arg(QString::number(iter+1),QString::number(max_iter)));
+        if(!isCliOnly)
+            sendLog(QString("Gradient Descent is running - %1/%2").arg(QString::number(iter+1),QString::number(max_iter)));
         
         //visualizing points
-        emit updatePoints(Y, N, 2);
-        if (iter > 0 && (iter % 50 == 0 || iter == pixelsne->get_max_iter() - 1)) {
+        if(!isCliOnly)
+            emit updatePoints(Y, N, 2);
+        if (iter > 0 && ((iter+1) % 50 == 0 || iter == pixelsne->get_max_iter() - 1)) {
             clock_gettime(CLOCK_MONOTONIC, &end_time);
 
-            printf("LargeQT: Iteration %d: 50 iterations in %4.2lf real seconds\n", iter, temptime);
+            printf("LargeQT: Iteration %d: 50 iterations in %4.2lf real seconds\n", iter+1, temptime);
             if(!outLoc.isEmpty())
             {
                 time_file = fopen(QString(outLoc).append("_time_label.txt").toUtf8().constData(), "a+");
@@ -250,11 +260,12 @@ void WorkerThread::run()
     }
     printf("LargeQT: Visualization ended at %.2lfs\n", total_time);
 
-    sendLog("Done.");
+    if(!isCliOnly)
+        sendLog("Done.");
     
     if(!outLoc.isEmpty())
     {
-        if(needExit)
+        if(needExit && !isCliOnly)
         {
             quit_app();
         }
@@ -278,7 +289,8 @@ void WorkerThread::loadLabels(int NN)
 	for (long long i = 0; i < NN; ++i)
         res = fscanf(fin, "%d", &labels[i]);
 	fclose(fin);
-    emit updateLabels(labels, NN);
+    if(!isCliOnly)
+        emit updateLabels(labels, NN);
     printf("LargeQT: Label file is loaded.\n");
 }
 

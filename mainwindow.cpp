@@ -44,7 +44,7 @@ MainWindow::MainWindow(int argc, char **argv)
     theta = 0.5;
     perp = 50;
     trees = -1;
-    rseed = 30;
+    rseed = 13;
     knnval = 1;
     prop = 3;
     pmethod = 0;
@@ -72,6 +72,7 @@ MainWindow::MainWindow(int argc, char **argv)
         printf("-threads: Number of threads. Default is 4.\n");
         printf("-pipelining: 1 for on, 0 for off. pipelining propagation. default is 1\n");
         printf("-bins: PixelSNE option. Default is 512\n");
+        printf("-cli: if 1 no gui will be given\n");
     }
     else
     {
