@@ -6,7 +6,7 @@ Building code in Ubuntu is recommended. ~~This project use clock_gettime() for b
 ### Linux(Ubuntu)
 1. install qt5, gsl from apt
 ```bash
-sudo apt-get install qtbase5-dev libgsl-dev libgsl0-dev libgsl0ldbl
+sudo apt-get install qt5-default qt5tools-dev-tools libgsl-dev libgsl0-dev libgsl0ldbl libboost-all
 ```
 2. [build and install qwt](http://qwt.sourceforge.net/qwtinstall.html). Don't forget to set QMAKEFEATURES.
 3. set QWT_PATH in largeqt.pro if path is changed.
