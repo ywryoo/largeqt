@@ -39,6 +39,12 @@ If output option is provided(only cli available), Logs are generated.
  - \*_variables.txt: given variables
  - \*_time_label.txt: timestamps for iterations. first line is init time of vis, next line is iter 1, and so on.
 
+## TODOs & Known Issues
+There are lots of things to do, but 
+ - loading labels are tricky
+ - some memory leak(not continuously, but hold some which need to be freed)
+ - Stops if input is too small
+
 ## Acknowledgement
  This project uses ANNOY, LargeVis, PixelSNE, QT and QWT with corresponding documents and papers. Links will be added afterwords.
 
