@@ -35,7 +35,7 @@ int main( int argc, char **argv )
     if(isCliOnly == 1)
     {
         char infile[1000], labelfile[1000], outfile[1000];
-        int prop, pmethod, threads, pipelining, trees, rseed, knnval, sleeping, fitting_threading;
+        int prop, pmethod, threads, pipelining, bhsne, trees, rseed, knnval, sleeping, fitting_threading;
         unsigned int bins;
         double theta, perp;
 
@@ -54,6 +54,7 @@ int main( int argc, char **argv )
         bins = 512;
         sleeping = 1;
         fitting_threading = 1;
+        bhsne = 0;
         
         if ((i = ArgPos((char *)"-input", argc, argv)) > 0) strcpy(infile, argv[i + 1]);
         if ((i = ArgPos((char *)"-label", argc, argv)) > 0) strcpy(labelfile, argv[i + 1]);
@@ -70,9 +71,9 @@ int main( int argc, char **argv )
         if ((i = ArgPos((char *)"-threads", argc, argv)) > 0) threads = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-pipelining", argc, argv)) > 0) pipelining = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-bins", argc, argv)) > 0) bins = atoi(argv[i + 1]);
-
+        if ((i = ArgPos((char *)"-bhsne", argc, argv)) > 0) bhsne = atoi(argv[i + 1]);
         WorkerThread *thread = new WorkerThread;
-        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleeping == 1 ? true : false, fitting_threading == 1 ? true : false, true);
+        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleeping == 1 ? true : false, fitting_threading == 1 ? true : false, bhsne == 1 ? true : false, true);
         if(!QString(outfile).isEmpty())
         {
 
@@ -109,6 +110,8 @@ int main( int argc, char **argv )
             sprintf(temp_str, "Bins: %d\n", bins);
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             sprintf(temp_str, "isCli: %d\n", isCliOnly);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "bhsneOnly: %d\n", bhsne);
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             fclose(fp_saved);
         }

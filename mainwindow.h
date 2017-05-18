@@ -51,6 +51,7 @@ private:
     QCheckBox* Qknn_validation;
     QCheckBox* Qsleeping;
     QCheckBox* Qgradient_threading;
+    QCheckBox* Qbhsne_only;
 
     QSpinBox* Qbins;
     WorkerThread *thread = NULL;
