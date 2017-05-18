@@ -88,6 +88,7 @@ HEADERS = \
     pixelsne/pixelsne.h \
     pixelsne/ptree.h \
     pixelsne/ANNOY/annoylib.h \
+    pixelsne/sptreeBH.h \
     pixelsne/ANNOY/kissrandom.h \
     pixelsne/vptree.h \
     borderlayout.h \
@@ -108,6 +109,7 @@ SOURCES = \
     plot.cpp \
     pixelsne/LargeVis.cpp \
     pixelsne/pixelsne.cpp \
+    pixelsne/sptreeBH.cpp \
     pixelsne/ptree.cpp \
     borderlayout.cpp \
     workerthread.cpp \
