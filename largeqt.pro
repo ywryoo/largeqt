@@ -4,7 +4,7 @@ macx {
 }
 include( $${QWT_ROOT}/qwtconfig.pri )
 include( $${QWT_ROOT}/qwtfunctions.pri )
-
+LIBS += -L$${QWT_ROOT}/lib
 OUT_ROOT = $${PWD}
 
 TEMPLATE     = app
