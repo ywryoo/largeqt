@@ -1,4 +1,8 @@
 QWT_ROOT = /usr/local/qwt-6.1.3
+HOME=/home/ywryoo
+NON_METRIC_SPACE_LIBRARY=$${HOME}/NonMetrLibRelease
+NON_METRIC_SPACE_LIBRARY_INC=$${NON_METRIC_SPACE_LIBRARY}/include
+NON_METRIC_SPACE_LIBRARY_LIB=$${NON_METRIC_SPACE_LIBRARY}/lib
 macx {
     QWT_ROOT = /usr/local/Cellar/qwt/6.1.3_4/features
 }
@@ -9,13 +13,14 @@ OUT_ROOT = $${PWD}
 
 TEMPLATE     = app
 
+INCLUDEPATH += $${NON_METRIC_SPACE_LIBRARY_INC}
 INCLUDEPATH += $${QWT_ROOT}/src
 DEPENDPATH  += $${QWT_ROOT}/src
 
 QT += widgets core
-QMAKE_CFLAGS	+=  -ffast-math -march=native -Ofast
-QMAKE_CXXFLAGS	+=  -ffast-math -march=native -Ofast
-
+QMAKE_CFLAGS	+=  -ffast-math -march=native -Ofast -fopenmp
+QMAKE_CXXFLAGS	+=  -ffast-math -march=native -Ofast -fopenmp
+LIBS += -fopenmp
 !debug_and_release {
 
     DESTDIR      = $${OUT_ROOT}/bin
@@ -96,12 +101,12 @@ HEADERS = \
     neighborthread.h \
     huecolormap.h
 
+LIBS += -L$${NON_METRIC_SPACE_LIBRARY_LIB}
 LIBS += -lm
 LIBS += -pthread
 LIBS += -lgsl
 LIBS += -lgslcblas
-
-
+LIBS += -lNonMetricSpaceLib
 
 SOURCES = \
     main.cpp \
