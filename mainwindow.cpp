@@ -53,7 +53,10 @@ MainWindow::MainWindow(int argc, char **argv)
     bins = 512;
     sleep = 1;
     fitting_threading = 1;
-    bhsne = 0;
+    bhsne = 1;
+    learning = 200.0;
+    max_iter = 1000;
+    early_iter = 250;
     
     if(argc < 3)
     {
@@ -75,6 +78,9 @@ MainWindow::MainWindow(int argc, char **argv)
         printf("-bins: PixelSNE option. Default is 512\n");
         printf("-cli: if 1 no gui will be given\n");
         printf("-bhsne: if 1 only bhsne will be running\n");
+        printf("-learn: learing rate\n");
+        printf("-maxiter: number of max iteration\n");
+        printf("-earlyiter: number of early exaggeration iteration\n");
     }
     else
     {
@@ -95,6 +101,9 @@ MainWindow::MainWindow(int argc, char **argv)
         if ((i = ArgPos((char *)"-pipelining", argc, argv)) > 0) pipelining = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-bins", argc, argv)) > 0) bins = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-bhsne", argc, argv)) > 0) bhsne = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-learn", argc, argv)) > 0) learning = atof(argv[i + 1]);
+        if ((i = ArgPos((char *)"-maxiter", argc, argv)) > 0) max_iter = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-earlyiter", argc, argv)) > 0) early_iter = atoi(argv[i + 1]);
 
     }
     //scatterplot
@@ -219,7 +228,7 @@ MainWindow::MainWindow(int argc, char **argv)
         connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleep == 1 ? true : false, fitting_threading == 1 ? true : false, bhsne == 1 ? true : false);
+        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleep == 1 ? true : false, fitting_threading == 1 ? true : false, bhsne == 1 ? true : false, learning, max_iter, early_iter);
         if(!QString(outfile).isEmpty())
         {
 
@@ -254,6 +263,14 @@ MainWindow::MainWindow(int argc, char **argv)
             sprintf(temp_str, "Pipelining(1 is on): %d\n", pipelining);
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             sprintf(temp_str, "Bins: %d\n", bins);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "bhsneOnly: %d\n", bhsne);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "learning rate: %lf\n", learning);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "max_iter: %d\n", max_iter);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "early_iter: %d\n", early_iter);
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
 
             fclose(fp_saved);
@@ -326,7 +343,7 @@ void MainWindow::startPixelSNE()
         connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),Qsleeping->isChecked(), Qgradient_threading->isChecked(), Qbhsne_only->isChecked());
+        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),Qsleeping->isChecked(), Qgradient_threading->isChecked(), Qbhsne_only->isChecked(), learning, max_iter, early_iter);
     }
 }
 
@@ -354,7 +371,7 @@ void MainWindow::restartPixelSNE()
     connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
     connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
     connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),Qsleeping->isChecked(), Qgradient_threading->isChecked(), Qbhsne_only->isChecked());
+    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),Qsleeping->isChecked(), Qgradient_threading->isChecked(), Qbhsne_only->isChecked(), learning, max_iter, early_iter);
 }
 
 int MainWindow::ArgPos(char *str, int argc, char **argv) {

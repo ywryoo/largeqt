@@ -35,9 +35,9 @@ int main( int argc, char **argv )
     if(isCliOnly == 1)
     {
         char infile[1000], labelfile[1000], outfile[1000];
-        int prop, pmethod, threads, pipelining, bhsne, trees, rseed, knnval, sleeping, fitting_threading;
+        int prop, pmethod, threads, pipelining, bhsne, trees, rseed, knnval, sleeping, fitting_threading, max_iter, early_iter;
         unsigned int bins;
-        double theta, perp;
+        double theta, perp,learn;
 
         strcpy(infile, "data.txt");
         strcpy(labelfile, "label.txt");
@@ -54,7 +54,10 @@ int main( int argc, char **argv )
         bins = 512;
         sleeping = 1;
         fitting_threading = 1;
-        bhsne = 0;
+        bhsne = 1;
+        learn = 200.0;
+        max_iter = 1000;
+        early_iter = 250;
         
         if ((i = ArgPos((char *)"-input", argc, argv)) > 0) strcpy(infile, argv[i + 1]);
         if ((i = ArgPos((char *)"-label", argc, argv)) > 0) strcpy(labelfile, argv[i + 1]);
@@ -72,8 +75,12 @@ int main( int argc, char **argv )
         if ((i = ArgPos((char *)"-pipelining", argc, argv)) > 0) pipelining = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-bins", argc, argv)) > 0) bins = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-bhsne", argc, argv)) > 0) bhsne = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-learn", argc, argv)) > 0) learn = atof(argv[i + 1]);
+        if ((i = ArgPos((char *)"-maxiter", argc, argv)) > 0) max_iter = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-earlyiter", argc, argv)) > 0) early_iter = atoi(argv[i + 1]);
+
         WorkerThread *thread = new WorkerThread;
-        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleeping == 1 ? true : false, fitting_threading == 1 ? true : false, bhsne == 1 ? true : false, true);
+        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleeping == 1 ? true : false, fitting_threading == 1 ? true : false, bhsne == 1 ? true : false, learn, max_iter, early_iter, true);
         if(!QString(outfile).isEmpty())
         {
 
@@ -112,6 +119,12 @@ int main( int argc, char **argv )
             sprintf(temp_str, "isCli: %d\n", isCliOnly);
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             sprintf(temp_str, "bhsneOnly: %d\n", bhsne);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "learning rate: %lf\n", learn);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "max_iter: %d\n", max_iter);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "early_iter: %d\n", early_iter);
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             fclose(fp_saved);
         }

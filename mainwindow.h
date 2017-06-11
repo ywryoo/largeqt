@@ -59,6 +59,8 @@ private:
     int *data_labels = NULL;
     int sleep;
     int fitting_threading;
+    int max_iter, early_iter;
+    double learning;
     int ArgPos(char *str, int argc, char **argv);
 };
 #endif
