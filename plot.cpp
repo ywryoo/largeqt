@@ -13,24 +13,72 @@
 
 class DistancePicker: public QwtPlotPicker
 {
+    Plot* plot;
 public:
-    DistancePicker( QWidget *canvas ):
-        QwtPlotPicker( canvas )
+    DistancePicker( Plot* plot, QWidget *canvas ):
+        QwtPlotPicker( canvas ), plot(plot)
     {
-        setTrackerMode( QwtPicker::ActiveOnly );
-        setStateMachine( new QwtPickerDragLineMachine() );
-        setRubberBand( QwtPlotPicker::PolygonRubberBand );
+        setTrackerMode( QwtPicker::AlwaysOn );
+        setStateMachine( new QwtPickerClickPointMachine() );
+        //setRubberBand( QwtPlotPicker::PolygonRubberBand );
     }
 
     virtual QwtText trackerTextF( const QPointF &pos ) const
     {
         QwtText text;
+        int point  = -1;
+        if(plot->label_num == 0)
+        {
+    //        point = plot->default_curve->closestPoint(new QPoint());
+            //printf("%f %f\n",pos.x(),pos.y());
+            double dmin = 1.0e10;
 
-        const QPolygon points = selection();
-        if ( !points.isEmpty() )
+            for(uint i=0;i<plot->default_curve->dataSize();i++)
+            {
+                double cx = plot->default_curve->sample(i).x() - pos.x();
+                double cy = plot->default_curve->sample(i).y() - pos.y();
+
+                const double f =  cx * cx + cy *cy;
+                if ( f < dmin )
+                {
+                    point = i;
+                    dmin = f;
+                }
+            }
+//            printf("%f %f\n",plot->default_curve->sample(point).x(), plot->default_curve->sample(point).y());
+
+        } else 
+        {
+                //        point = plot->default_curve->closestPoint(new QPoint());
+//            printf("%f %f\n",pos.x(),pos.y());
+            double dmin = 1.0e10;
+            double x,y;
+
+            for(int i=0;i<plot->label_num;i++)
+            {
+                for(int j=0;j<plot->mappingtable[i].size();j++)
+                {
+                    double cx = plot->d_curves[i]->sample(j).x() - pos.x();
+                    double cy = plot->d_curves[i]->sample(j).y() - pos.y();
+
+                    const double f =  cx * cx + cy *cy;
+                    if ( f < dmin )
+                    {
+                        point = plot->mappingtable[i][j];
+                        dmin = f;
+                        x = plot->d_curves[i]->sample(j).x();
+                        y = plot->d_curves[i]->sample(j).y();
+                    }
+                }
+            }
+//            printf("%lf %lf\n",x,y);
+
+        }
+        if ( point !=-1)
         {
             QString num;
-            num.setNum( QLineF( pos, invTransform( points[0] ) ).length() );
+            num.setNum( point  );
+            //printf("%d\n",point);
 
             QColor bg( Qt::white );
             bg.setAlpha( 200 );
@@ -75,8 +123,8 @@ Plot::Plot( QWidget *parent ):
     magnifier->setMouseButton( Qt::NoButton );
 
     // distanve measurement with the right mouse button
-    //DistancePicker *picker = new DistancePicker( canvas() );
-    //picker->setMousePattern( QwtPlotPicker::MouseSelect1, Qt::RightButton );
+    DistancePicker *picker = new DistancePicker( this, canvas() );
+    picker->setMousePattern( QwtPlotPicker::MouseSelect1, Qt::RightButton );
     //picker->setRubberBandPen( QPen( Qt::blue ) );
 }
 
@@ -138,12 +186,16 @@ void Plot::setLabels(int max)
 
 void Plot::setSamplesWithLabels(double* Y, int* data_labels, int N, int no_dims)
 {
+        for(int i=0;i<mappingtable.size();i++) mappingtable[i].clear();
+        mappingtable.clear();
+        for(int i = 0; i < label_num; i++) mappingtable.push_back(std::vector<int>());
         QPolygonF samples[label_num];
         for(int i = 0; i < label_num; i++) samples[i] = QPolygonF();
         if(no_dims == 2) {
             for ( long long i = 0; i < N; i++ )
             {
                 samples[data_labels[i]] += QPointF(Y[i*no_dims],Y[i*no_dims+1] );
+                mappingtable[data_labels[i]].push_back(i);
             }
 
         }
