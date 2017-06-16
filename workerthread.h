@@ -21,8 +21,8 @@ class WorkerThread : public QThread
 public:
     WorkerThread(QObject *parent = 0);
     ~WorkerThread();
-    void runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees, bool sleep, bool threading, bool bhsne, double learn, int max_iter, int early_iter);
-    void runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees, bool sleep, bool threading,bool bhsne, double learn, int max_iter, int early_iter, bool cliOnly=false);
+    void runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees, bool sleep, bool threading, bool bhsne, double learn, int max_iter, int early_iter,double sratee);
+    void runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads,bool isPipelined,bool isRandInit, int n_rptrees, bool sleep, bool threading,bool bhsne, double learn, int max_iter, int early_iter, double sratee, bool cliOnly=false);
     void stopWorkers();
     bool initDone();
 protected:
@@ -51,6 +51,7 @@ private:
     double  theta;
     double* data;
     double learning_rate;
+    double srate;
     int* labels;
     unsigned int bins;
     int     p_method;

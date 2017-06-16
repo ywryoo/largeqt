@@ -48,7 +48,7 @@ WorkerThread::~WorkerThread()
 }
 
 
-void WorkerThread::runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees, bool sleep, bool threading, bool bhsne, double learning, int maxIter, int early_iter)
+void WorkerThread::runrun(QString input, QString label, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees, bool sleep, bool threading, bool bhsne, double learning, int maxIter, int early_iter, double sratee)
 {
     inputLoc = input;
     labelLoc = label;
@@ -68,6 +68,7 @@ void WorkerThread::runrun(QString input, QString label, int propagation_num, dou
     max_iter = maxIter;
     stop_lying_iter = early_iter;
     learning_rate = learning;
+    srate = sratee;
    if (!isRunning()) {
         start(LowPriority);
     }/* else {
@@ -75,7 +76,7 @@ void WorkerThread::runrun(QString input, QString label, int propagation_num, dou
         condition.wakeOne();
     }*/
 }
-void WorkerThread::runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees,bool sleep, bool threading, bool bhsne, double learning, int maxIter, int early_iter, bool cliOnly)
+void WorkerThread::runrun(QString input, QString label, QString out, int propagation_num, double th, double perp, unsigned int binbin, int pm, int rseed, int threads, bool isPipelined, bool isValidation, int n_rptrees,bool sleep, bool threading, bool bhsne, double learning, int maxIter, int early_iter, double sratee, bool cliOnly)
 {
     inputLoc = input;
     labelLoc = label;
@@ -97,7 +98,7 @@ void WorkerThread::runrun(QString input, QString label, QString out, int propaga
     max_iter = maxIter;
     stop_lying_iter = early_iter;
     learning_rate = learning;
-
+    srate = sratee;
     needExit = true;
 
    if (!isRunning()) {
@@ -201,7 +202,7 @@ void WorkerThread::run()
 
 
     //run RP Tree ONLY
-    pixelsne->run(data, N, D, Y, 2, perplexity, theta, bins, p_method, rand_seed, n_threads, n_propagations, false, n_trees, bhsneOnly, knn_validation, pipelineEnabled ,learning_rate, max_iter, stop_lying_iter, mom_switch_iter);
+    pixelsne->run(data, N, D, Y, 2, perplexity, theta, bins, p_method, rand_seed, n_threads, n_propagations, false, n_trees, bhsneOnly, knn_validation, pipelineEnabled ,srate, learning_rate, max_iter, stop_lying_iter, mom_switch_iter);
 
     isInitDone = true;
     //run background threads for neighbor exploring

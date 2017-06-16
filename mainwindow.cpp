@@ -34,7 +34,7 @@ MainWindow::MainWindow(int argc, char **argv)
     char infile[1000], labelfile[1000], outfile[1000];
     int prop, pmethod, threads, pipelining, trees, rseed, knnval, bhsne;
     unsigned int bins;
-    double theta, perp;
+    double theta, perp, srate;
 
 	long long i;
 
@@ -57,7 +57,8 @@ MainWindow::MainWindow(int argc, char **argv)
     learning = 200.0;
     max_iter = 1000;
     early_iter = 250;
-    
+    srate = 20;
+
     if(argc < 3)
     {
         printf("GUI Mode is used if no args are provided. You can instantly run  largeqt by using these options\n");
@@ -81,6 +82,7 @@ MainWindow::MainWindow(int argc, char **argv)
         printf("-learn: learing rate\n");
         printf("-maxiter: number of max iteration\n");
         printf("-earlyiter: number of early exaggeration iteration\n");
+        printf("-srate: skipping rate\n");
     }
     else
     {
@@ -104,6 +106,7 @@ MainWindow::MainWindow(int argc, char **argv)
         if ((i = ArgPos((char *)"-learn", argc, argv)) > 0) learning = atof(argv[i + 1]);
         if ((i = ArgPos((char *)"-maxiter", argc, argv)) > 0) max_iter = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-earlyiter", argc, argv)) > 0) early_iter = atoi(argv[i + 1]);
+        if ((i = ArgPos((char *)"-srate", argc, argv)) > 0) srate = atof(argv[i + 1]);
 
     }
     //scatterplot
@@ -228,7 +231,7 @@ MainWindow::MainWindow(int argc, char **argv)
         connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleep == 1 ? true : false, fitting_threading == 1 ? true : false, bhsne == 1 ? true : false, learning, max_iter, early_iter);
+        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleep == 1 ? true : false, fitting_threading == 1 ? true : false, bhsne == 1 ? true : false, learning, max_iter, early_iter,srate);
         if(!QString(outfile).isEmpty())
         {
 
@@ -272,7 +275,8 @@ MainWindow::MainWindow(int argc, char **argv)
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             sprintf(temp_str, "early_iter: %d\n", early_iter);
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
-
+            sprintf(temp_str, "srate: %lf\n", srate);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             fclose(fp_saved);
         }
     }
@@ -343,7 +347,7 @@ void MainWindow::startPixelSNE()
         connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
         connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
         connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),Qsleeping->isChecked(), Qgradient_threading->isChecked(), Qbhsne_only->isChecked(), learning, max_iter, early_iter);
+        thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),Qsleeping->isChecked(), Qgradient_threading->isChecked(), Qbhsne_only->isChecked(), learning, max_iter, early_iter,srate);
     }
 }
 
@@ -371,7 +375,7 @@ void MainWindow::restartPixelSNE()
     connect(thread, SIGNAL(updatePoints(double*,int,int)), this, SLOT(setSamples(double*,int,int)));
     connect(thread, SIGNAL(updateLabels(int*,int)), this, SLOT(setLabels(int*,int)));
     connect(thread, SIGNAL(sendLog(QString)), this, SLOT(setConsoleText(QString)) );
-    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),Qsleeping->isChecked(), Qgradient_threading->isChecked(), Qbhsne_only->isChecked(), learning, max_iter, early_iter);
+    thread->runrun(QinputLocation->text(), QlabelLocation->text(), Qn_propagations->value(), Qtheta->value(), Qperplexity->value(), Qbins->value(), Qp_method->value(), Qrand_seed->value(), Qn_threads->value(), QPipelining->isChecked(),Qknn_validation->isChecked(), Qn_rptrees->value(),Qsleeping->isChecked(), Qgradient_threading->isChecked(), Qbhsne_only->isChecked(), learning, max_iter, early_iter,srate);
 }
 
 int MainWindow::ArgPos(char *str, int argc, char **argv) {

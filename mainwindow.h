@@ -61,6 +61,7 @@ private:
     int fitting_threading;
     int max_iter, early_iter;
     double learning;
+    double srate;
     int ArgPos(char *str, int argc, char **argv);
 };
 #endif

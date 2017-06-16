@@ -37,7 +37,7 @@ int main( int argc, char **argv )
         char infile[1000], labelfile[1000], outfile[1000];
         int prop, pmethod, threads, pipelining, bhsne, trees, rseed, knnval, sleeping, fitting_threading, max_iter, early_iter;
         unsigned int bins;
-        double theta, perp,learn;
+        double theta, perp,learn,srate;
 
         strcpy(infile, "data.txt");
         strcpy(labelfile, "label.txt");
@@ -55,6 +55,7 @@ int main( int argc, char **argv )
         sleeping = 1;
         fitting_threading = 1;
         bhsne = 1;
+        srate = 20;
         learn = 200.0;
         max_iter = 1000;
         early_iter = 250;
@@ -78,9 +79,9 @@ int main( int argc, char **argv )
         if ((i = ArgPos((char *)"-learn", argc, argv)) > 0) learn = atof(argv[i + 1]);
         if ((i = ArgPos((char *)"-maxiter", argc, argv)) > 0) max_iter = atoi(argv[i + 1]);
         if ((i = ArgPos((char *)"-earlyiter", argc, argv)) > 0) early_iter = atoi(argv[i + 1]);
-
+        if ((i = ArgPos((char *)"-srate", argc, argv)) > 0) srate = atof(argv[i + 1]);
         WorkerThread *thread = new WorkerThread;
-        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleeping == 1 ? true : false, fitting_threading == 1 ? true : false, bhsne == 1 ? true : false, learn, max_iter, early_iter, true);
+        thread->runrun(QString(infile), QString(labelfile), QString(outfile), prop, theta, perp, bins, pmethod, rseed, threads, pipelining == 1 ? true : false,knnval == 1 ? true : false, trees, sleeping == 1 ? true : false, fitting_threading == 1 ? true : false, bhsne == 1 ? true : false, learn, max_iter, early_iter, true,srate);
         if(!QString(outfile).isEmpty())
         {
 
@@ -125,6 +126,8 @@ int main( int argc, char **argv )
             sprintf(temp_str, "max_iter: %d\n", max_iter);
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             sprintf(temp_str, "early_iter: %d\n", early_iter);
+            fwrite(temp_str, strlen(temp_str), 1, fp_saved);
+            sprintf(temp_str, "srate: %lf\n", srate);
             fwrite(temp_str, strlen(temp_str), 1, fp_saved);
             fclose(fp_saved);
         }
