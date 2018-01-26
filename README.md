@@ -1,54 +1,56 @@
-# largeqt
+# psne
 
 ## Installation
-Building code in Ubuntu is recommended. ~~This project use clock_gettime() for benchmarking, which is not supported in OS X.~~ *Note. Not verified* Also, windows does not support now. pthread is used for multi threading, which can only be used in \*nix systems. It is possible to build in windows if some code is changed. However, that is not in a schedule.
+Building code in Ubuntu is recommended.
 
 ### Linux(Ubuntu)
-1. install qt5, gsl from apt
+1. Clone this repository - [psne]](https://github.com/ywryoo/psne)
+2. Download [qwt 6.1.3](http://qwt.sourceforge.net/qwtinstall.html) and [nmslib 1.5.3](https://github.com/searchivarius/nmslib)
+3. Install [QT 5](https://www.qt.io/download). Commercial license is not needed.
+4. Install build tools and gsl library to compile qwt
 ```bash
-sudo apt-get install qt5-default qt5tools-dev-tools libgsl-dev libgsl0-dev libgsl0ldbl libboost-all
+sudo apt-get install build-essential libgl1-mesa-dev
 ```
-2. [build and install qwt](http://qwt.sourceforge.net/qwtinstall.html). Don't forget to set QMAKEFEATURES.
-3. set QWT_PATH in largeqt.pro if path is changed.
-4. set LD_LIBRARY_PATH for qwt at ~/.bashrc
+5. Locate qwt source files to `/usr/local/qwt-6.1.3` and build it
 ```bash
-LD_LIBRARY_PATH="/usr/local/qwt-6.1.3:$LD_LIBRARY_PATH"
+cd /usr/local/qwt-6.1.3
+make
+``` 
+6. set LD_LIBRARY_PATH for qwt at ~/.bashrc
+```bash
+LD_LIBRARY_PATH="/usr/local/qwt-6.1.3/lib:$LD_LIBRARY_PATH"
 ```
-5. `qmake largeqt.pro`
-6. `cd ./bin && ./scatterplot`
+7. Install cmake, boost, libgsl0, libeigen3 to compile nmslib
+```bash
+sudo apt-get install cmake libgsl0-dev libeigen3-dev libboost-all
+```
+8. locate nmslib and build it by using command below - for setting release mode with fixed location
+```bash
+cmake \
+ -DCMAKE_INSTALL_PREFIX=$HOME/NonMetrLibRelease \
+ -DCMAKE_BUILD_TYPE=Release .
+```
+9. set qwt and nmslib path at `psne.pro` if location is changed.
+10. `qmake psne.pro`
+11. `cd ./bin && ./scatterplot`
 
-### Mac
-
-1. install homebrew
-2. install gsl, qwt, qt from brew
+- If you do not use GUI, install qt dev tools instead of QT5 to complie psne
 ```bash
-brew install gsl qwt qt
+sudo apt-get install qt5-default, libqt5svg5-dev
 ```
-3. set QWT_PATH in largeqt.pro if path is changed.
-4. [set QMAKEFEATURES](http://qwt.sourceforge.net/qwtinstall.html).
-4. link libraries(see [this link](http://stackoverflow.com/questions/18588418/install-and-use-qwt-under-mac-os-x) if you encounter a problem)
-5. change lseek64 to lseek in annoylib.h([link](https://github.com/lferry007/LargeVis)). 
-6. `qmake largeqt.pro`
-7. `cd ./bin/scatterplot.app/Conetents/MacOS && ./scatterplot`
 
 ## Usage
  - if you made .dat file from pixelsne matlab wrapper, you can use the data without parameter by using .dat extension as input file name. labels are single numbers, data should be formatted like LargeVis.
+ - detailed command is presented when executed.
+
 ### Logs
-If output option is provided(only cli available), Logs are generated.
+If output option is provided(option is availabled in cli only), logs are generated.
  - \*_iter_n.log: N, D, Y, C(error) is written by binary. you can use this log as input to see the result.
  - \*_variables.txt: given variables
  - \*_time_label.txt: timestamps for iterations. first line is init time of vis, next line is iter 1, and so on.
 
-## TODOs & Known Issues
-There are lots of things to do, but 
- - loading labels are tricky
- - some memory leak(not continuously, but hold some which need to be freed)
- - Stops if input is too small
-
 ## Acknowledgement
- This project uses ANNOY, LargeVis, PixelSNE, QT and QWT with corresponding documents and papers. Links will be added afterwords.
+ This project uses ANNOY, LargeVis, PixelSNE, QT and QWT with corresponding documents and papers.
 
 ## License
- There are several licenses for each source code, which is noticed above in each source code. ANNOY and LargeVis takes Apache License 2.0, pixelsne has no License yet(this code is continuation of pixelsne on some part so there are no problem to use it), QT and QWT is LGPL or similar and others are LGPL by Ryangwook Ryoo.
-
- 
+ There are diffrent licenses for each source code respectively. ANNOY and LargeVis takes Apache License 2.0, pixelsne has no License yet(This repository is continued work of pixelsne), QT and QWT is LGPL or similar and others are LGPL by Ryangwook Ryoo. 
